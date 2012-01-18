@@ -1,8 +1,12 @@
 var assert = require('assert');
+var t1=+new Date;
 var geoip = require('../lib/geoip');
+var t2=+new Date;
 
 if(process.argv.length > 2) {
 	console.dir(geoip.lookup(process.argv[2]));
+	var t3 = +new Date;
+	console.log("Startup: %dms, exec: %dms", t2-t1, t3-t2);
 	process.exit();
 }
 
@@ -40,5 +44,6 @@ f.forEach(function(ip) {
 */
 
 console.log("Found %d (%d/%d) ips in %dms (%s ip/s) (%sμs/ip)", n, f.length, nf.length, te-ts, (n*1000/(te-ts)).toFixed(3), ((te-ts)*1000/n).toFixed(0));
+console.log("Took %d ms to startup", t2-t1);
 
 
