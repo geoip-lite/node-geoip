@@ -53,8 +53,11 @@ console.log(geo);
 
 installation
 ------------
+### 1. get the library
 
     $ npm install geoip-lite
+
+### 2. get the datafiles
 
 Then download the city data files from https://github.com/bluesmoon/node-geoip/tree/master/data
 You need to get `geoip-city.dat` and `geoip-city-names.dat` and put them into the `data/` directory
