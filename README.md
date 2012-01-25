@@ -85,8 +85,9 @@ If the IP address was found, the `lookup` method returns an object with the foll
 {
    range: [ <low bound of IP block>, <high bound of IP block> ],
    country: 'XX',    // 2 letter ISO-3166-1 country code
-   region: 'RR',     // 2 character region code.  For US states this is the 2 letter ISO-3166-2 subcountry code
-                     // for other countries, this is the FIPS 10-4 subcountry code
+   region: 'RR',     // 2 character region code.  For US states this is the 2 letter
+                     // ISO-3166-2 subcountry code for other countries, this is the
+                     // FIPS 10-4 subcountry code
    city: "City Name" // This is the full city name
 }
 ```
