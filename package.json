@@ -5,7 +5,7 @@
 	"keywords"    :  ["geo", "geoip", "ip", "ipv4", "ipv6", "geolookup", "maxmind", "geolite"],
 	"homepage"    :  "https://github.com/bluesmoon/node-geoip",
 	"author"      :  "Philip Tellis <philip@bluesmoon.info> (http://bluesmoon.info/)",
-	"files"       :  ["lib/", "data/", "test/" ],
+	"files"       :  ["lib/", "data/geoip-country.dat", "data/geoip-country6.dat", "test/" ],
 	"main"        :  "lib/geoip.js",
 	"repository"  :  { "type": "git", "url": "git://github.com/bluesmoon/node-geoip.git" },
 	"engines"     :  { "node": ">=0.5.7" }

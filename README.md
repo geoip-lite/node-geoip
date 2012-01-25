@@ -56,6 +56,9 @@ installation
 
     $ npm install geoip-lite
 
+Then download the city data files from https://github.com/bluesmoon/node-geoip/tree/master/data
+You need to get `geoip-city.dat` and `geoip-city-names.dat` and put them into the `data/` directory
+of this package.
 
 API
 ---
@@ -101,6 +104,18 @@ the `pretty` method can be used to turn it into a human readable string.
 
 This method returns a string if the input was in a format that `geoip-lite` can recognise, else it returns the
 input itself.
+
+Caveats
+-------
+
+This package includes the GeoLite database from MaxMind.  This database is not the most accurate database available,
+however it is the best available for free.  You can use the commercial GeoIP database from MaxMind with better
+accuracy by buying a license from MaxMind, and then using the conversion utility to convert it to a format that
+geoip-lite understands.  You will need to use the `.csv` files from MaxMind for conversion.
+
+Also note that on occassion, the library may take up to 5 seconds to load into memory.  This is largely dependent on
+how busy your disk is at that time.  It can take as little as 200ms on a lightly loaded disk.  This is a one time
+cost though, and you make it up at run time with very fast lookups.
 
 References
 ----------
