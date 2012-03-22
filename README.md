@@ -48,7 +48,8 @@ console.log(geo);
 { range: [ 3479299040, 3479299071 ],
   country: 'US',
   region: 'CA',
-  city: 'San Francisco' }
+  city: 'San Francisco',
+  ll: [37.7484, -122.4156] }
 ```
 
 installation
@@ -84,11 +85,12 @@ If the IP address was found, the `lookup` method returns an object with the foll
 ```javascript
 {
    range: [ <low bound of IP block>, <high bound of IP block> ],
-   country: 'XX',    // 2 letter ISO-3166-1 country code
-   region: 'RR',     // 2 character region code.  For US states this is the 2 letter
-                     // ISO-3166-2 subcountry code for other countries, this is the
-                     // FIPS 10-4 subcountry code
-   city: "City Name" // This is the full city name
+   country: 'XX',                 // 2 letter ISO-3166-1 country code
+   region: 'RR',                  // 2 character region code.  For US states this is the 2 letter
+                                  // ISO-3166-2 subcountry code for other countries, this is the
+                                  // FIPS 10-4 subcountry code
+   city: "City Name",             // This is the full city name
+   ll: [<latitude>, <longitude>]  // The latitude and longitude of the city
 }
 ```
 
