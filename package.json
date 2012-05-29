@@ -8,6 +8,11 @@
 	"files"       :  ["lib/", "data/geoip-country.dat", "data/geoip-country6.dat", "test/" ],
 	"main"        :  "lib/geoip.js",
 	"repository"  :  { "type": "git", "url": "git://github.com/bluesmoon/node-geoip.git" },
-	"engines"     :  { "node": ">=0.5.7" }
+	"engines"     :  { "node": ">=0.5.7" },
+	"scripts"     : {
+		"test" : "mocha test/geo-lookup.test.js"
+	},
+	"devDependencies": {
+		"mocha": "~1.0.3"
+	}
 }
-
