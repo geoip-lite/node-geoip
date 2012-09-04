@@ -13,6 +13,7 @@
 		"test" : "mocha test/geo-lookup.test.js"
 	},
 	"devDependencies": {
-		"mocha": "~1.0.3"
+		"mocha": "~1.0.3",
+		"line-input-stream": "~1.0.0"
 	}
 }
