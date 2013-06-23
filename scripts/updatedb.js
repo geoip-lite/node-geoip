@@ -35,8 +35,8 @@ var databases = [{
 	type: 'city-extended',
 	url: 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity_20121204.zip',
 	src: [
-		'GeoLiteCity/GeoLiteCity-Blocks.csv',
-		'GeoLiteCity/GeoLiteCity-Location.csv'
+		'GeoLiteCity-Blocks.csv',
+		'GeoLiteCity-Location.csv'
 	],
 	dest: [
 		'geoip-city.dat',
@@ -112,27 +112,26 @@ function fetch(downloadUrl, cb) {
 	process.stdout.write('Retrieving ' + fileName + ' ...');
 }
 
-function extract(tmpFile, tmpFileName, cb) {
+function extract(wantedFiles, tmpFile, tmpFileName, cb) {
+	// force cast to array
+	if (typeof(wantedFiles) === "string")
+		wantedFiles = new Array(wantedFiles);
+	
 	if (tmpFileName.indexOf('.zip') === -1) {
 		cb();
 	} else {
 		process.stdout.write('Extracting ' + tmpFileName + ' ...');
 
-		var unzipStream = unzip.Extract({
-			path: path.dirname(tmpFile)
+		var pipeSteam = fs.createReadStream(tmpFile).pipe(unzip.Parse());
+		pipeSteam.on('entry', function(entry) {
+			var fileName = entry.path.toString().split('/').pop();
+			if (wantedFiles.indexOf(fileName) > -1)
+				entry.pipe(fs.createWriteStream(path.join(path.dirname(tmpFile), fileName)));
+			else
+				entry.autodrain();
 		});
-
-		var pipeSteam = fs.createReadStream(tmpFile).pipe(unzipStream);
-
-		pipeSteam.on('end', function() {
+		pipeSteam.on('finish', function() {
 			console.log(' DONE'.green);
-
-			if (tmpFileName.indexOf('GeoLiteCity') !== -1) {
-				var oldPath = path.join(tmpPath, path.basename(tmpFileName, '.zip'));
-				var newPath = path.join(tmpPath, 'GeoLiteCity');
-				fs.renameSync(oldPath, newPath);
-			}
-
 			cb();
 		});
 	}
@@ -140,6 +139,9 @@ function extract(tmpFile, tmpFileName, cb) {
 
 function processCountryData(src, dest, cb) {
 	function processLine(line) {
+		if (line.match(/^Copyright/) || !line.match(/\d/)) {
+			return;
+		}
 		var fields = line.split(/, */);
 
 		if (fields.length < 6) {
@@ -353,7 +355,7 @@ mkdir(tmpPath);
 
 async.forEachSeries(databases, function(database, nextDatabase) {
 	fetch(database.url, function(tmpFile, tmpFileName) {
-		extract(tmpFile, tmpFileName, function() {
+		extract(database.src, tmpFile, tmpFileName, function() {
 			processData(database.type, database.src, database.dest, function() {
 				console.log();
 				nextDatabase();

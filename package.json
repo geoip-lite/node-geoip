@@ -22,7 +22,7 @@
 		"async": "~0.1.22",
 		"colors": "0.6.0-1",
 		"rimraf": "~2.0.2",
-		"unzip": "~0.0.4",
+		"unzip": "~0.1.8",
 		"line-input-stream": "1.0.1"
 	},
 	"devDependencies": {
