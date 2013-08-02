@@ -13,6 +13,7 @@ fs.existsSync = fs.existsSync || path.existsSync;
 
 var async = require('async');
 var colors = require('colors');
+var glob = require('glob');
 var LineInputStream = require('line-input-stream');
 var rimraf = require('rimraf').sync;
 var unzip = require('unzip');
@@ -33,7 +34,7 @@ var databases = [{
 	dest: 'geoip-country6.dat'
 },{
 	type: 'city-extended',
-	url: 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity_20121204.zip',
+	url: 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip',
 	src: [
 		'GeoLiteCity/GeoLiteCity-Blocks.csv',
 		'GeoLiteCity/GeoLiteCity-Location.csv'
@@ -129,6 +130,13 @@ function extract(tmpFile, tmpFileName, cb) {
 
 			if (tmpFileName.indexOf('GeoLiteCity') !== -1) {
 				var oldPath = path.join(tmpPath, path.basename(tmpFileName, '.zip'));
+				if(!fs.existsSync(oldPath)) {
+					if(/-latest$/.test(oldPath)) {
+						var prefix = oldPath.replace(/-latest$/, '');
+						oldPath = glob.sync(prefix + '_*')[0];
+					}
+				}
+
 				var newPath = path.join(tmpPath, 'GeoLiteCity');
 				fs.renameSync(oldPath, newPath);
 			}
