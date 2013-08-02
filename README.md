@@ -111,6 +111,17 @@ the `pretty` method can be used to turn it into a human readable string.
 This method returns a string if the input was in a format that `geoip-lite` can recognise, else it returns the
 input itself.
 
+Built-in Updater
+----------------
+
+This package contains an update script that can pull the files from MaxMind and handle the conversion from CSV.
+A npm script alias has been setup to make this process easy. Please keep in mind this requires internet and MaxMind
+rate limits that amount of downloads on thier servers.
+
+```shell
+npm run-script updatedb
+```
+
 Caveats
 -------
 
