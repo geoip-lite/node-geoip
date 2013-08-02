@@ -111,6 +111,14 @@ the `pretty` method can be used to turn it into a human readable string.
 This method returns a string if the input was in a format that `geoip-lite` can recognise, else it returns the
 input itself.
 
+### Start and stop watching for data updates ###
+
+If you have a server running `geoip-lite`, and you want to update its geo data without having to restart it,
+you can enable the data watcher to automaticaly refresh geo data upon file changes in the data directory.
+This tool can be used with `npm run-script updatedb` to periodically update geo data on a 
+running server.
+
+
 Built-in Updater
 ----------------
 
