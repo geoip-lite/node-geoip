@@ -113,10 +113,9 @@ input itself.
 
 ### Start and stop watching for data updates ###
 
-If you have a server running `geoip-lite`, and you want to update its geo data without having to restart it,
-you can enable the data watcher to automaticaly refresh geo data upon file changes in the data directory.
-This tool can be used with `npm run-script updatedb` to periodically update geo data on a 
-running server.
+If you have a server running `geoip-lite`, and you want to update its geo data without a restart, you can enable
+the data watcher to automatically refresh in-memory geo data when a file changes in the data directory.  This tool
+can be used with `npm run-script updatedb` to periodically update geo data on a running server.
 
 
 Built-in Updater
