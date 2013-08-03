@@ -14,7 +14,8 @@ fs.existsSync = fs.existsSync || path.existsSync;
 var async = require('async');
 var colors = require('colors');
 var glob = require('glob');
-var LineInputStream = require('line-input-stream');
+var iconv = require('iconv-lite');
+var lazy = require('lazy');
 var rimraf = require('rimraf').sync;
 var unzip = require('unzip');
 var utils = require('../lib/utils');
@@ -202,16 +203,18 @@ function processCountryData(src, dest, cb) {
 
 	process.stdout.write('Processing Data (may take a moment) ...');
 	var datFile = fs.openSync(dataFile, "w");
-	var csvStream = new LineInputStream(fs.createReadStream(tmpDataFile), /[\r\n]+/);
 
-	csvStream.setEncoding('utf8');
-
-	csvStream.on('line', processLine);
-
-	csvStream.on('end', function() {
-		console.log(' DONE'.green);
-		cb();
-	});
+	lazy(fs.createReadStream(tmpDataFile))
+		.lines
+		.map(function(byteArray) {
+			return iconv.decode(byteArray, 'latin1');
+		})
+		.skip(1)
+		.map(processLine)
+		.on('pipe', function() {
+			console.log(' DONE'.green);
+			cb();
+		});
 }
 
 function processCityData(src, dest, cb) {
@@ -287,13 +290,14 @@ function processCityData(src, dest, cb) {
 	process.stdout.write('Processing Data (may take a moment) ...');
 	var datFile = fs.openSync(dataFile, "w");
 
-	var csvStream = new LineInputStream(fs.createReadStream(tmpDataFile), /[\r\n]+/);
-	csvStream.setEncoding('utf8');
-
-	csvStream.on('line', processLine);
-	csvStream.on('end', function() {
-		cb();
-	});
+	lazy(fs.createReadStream(tmpDataFile))
+		.lines
+		.map(function(byteArray) {
+			return iconv.decode(byteArray, 'latin1');
+		})
+		.skip(1)
+		.map(processLine)
+		.on('pipe', cb);
 }
 
 function processCityDataNames(src, dest, cb) {
@@ -329,13 +333,14 @@ function processCityDataNames(src, dest, cb) {
 
 	var datFile = fs.openSync(dataFile, "w");
 
-	var csvStream = new LineInputStream(fs.createReadStream(tmpDataFile), /[\r\n]+/);
-	csvStream.setEncoding('utf8');
-
-	csvStream.on('line', processLine);
-	csvStream.on('end', function() {
-		cb();
-	});
+	lazy(fs.createReadStream(tmpDataFile))
+		.lines
+		.map(function(byteArray) {
+			return iconv.decode(byteArray, 'latin1');
+		})
+		.skip(1)
+		.map(processLine)
+		.on('pipe', cb);
 }
 
 function processData(type, src, dest, cb) {
