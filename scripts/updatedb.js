@@ -148,6 +148,7 @@ function extract(tmpFile, tmpFileName, cb) {
 }
 
 function processCountryData(src, dest, cb) {
+	var lines=0;
 	function processLine(line) {
 		var fields = line.split(/, */);
 
@@ -155,6 +156,7 @@ function processCountryData(src, dest, cb) {
 			console.log("weird line: %s::", line);
 			return;
 		}
+		lines++;
 
 		var sip;
 		var eip;
@@ -193,6 +195,10 @@ function processCountryData(src, dest, cb) {
 		b.write(cc, bsz - 2);
 
 		fs.writeSync(datFile, b, 0, bsz, null);
+		if(Date.now() - tstart > 5000) {
+			tstart = Date.now();
+			process.stdout.write('\nStill working (' + lines + ') ...');
+		}
 	}
 
 	var dataFile = path.join(dataPath, dest);
@@ -202,6 +208,7 @@ function processCountryData(src, dest, cb) {
 	mkdir(dataFile);
 
 	process.stdout.write('Processing Data (may take a moment) ...');
+	var tstart = Date.now();
 	var datFile = fs.openSync(dataFile, "w");
 
 	lazy(fs.createReadStream(tmpDataFile))
@@ -218,6 +225,7 @@ function processCountryData(src, dest, cb) {
 }
 
 function processCityData(src, dest, cb) {
+	var lines = 0;
 	function processLine(line) {
 		if (line.match(/^Copyright/) || !line.match(/\d/)) {
 			return;
@@ -231,6 +239,8 @@ function processCityData(src, dest, cb) {
 		var bsz;
 
 		var i;
+
+		lines++;
 
 		if (fields[0].match(/:/)) {
 			// IPv6
@@ -280,6 +290,10 @@ function processCityData(src, dest, cb) {
 		}
 
 		fs.writeSync(datFile, b, 0, b.length, null);
+		if(Date.now() - tstart > 5000) {
+			tstart = Date.now();
+			process.stdout.write('\nStill working (' + lines + ') ...');
+		}
 	}
 
 	var dataFile = path.join(dataPath, dest);
@@ -288,6 +302,7 @@ function processCityData(src, dest, cb) {
 	rimraf(dataFile);
 
 	process.stdout.write('Processing Data (may take a moment) ...');
+	var tstart = Date.now();
 	var datFile = fs.openSync(dataFile, "w");
 
 	lazy(fs.createReadStream(tmpDataFile))
