@@ -58,6 +58,28 @@ function mkdir(name) {
 	}
 }
 
+// Ref: http://stackoverflow.com/questions/8493195/how-can-i-parse-a-csv-string-with-javascript
+// Return array of string values, or NULL if CSV string not well formed.
+function CSVtoArray(text) {
+    var re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
+    var re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
+    // Return NULL if input string is not well formed CSV string.
+    if (!re_valid.test(text)) return null;
+    var a = [];                     // Initialize array to receive values.
+    text.replace(re_value, // "Walk" the string using replace with callback.
+        function(m0, m1, m2, m3) {
+            // Remove backslash from \' in single quoted values.
+            if      (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
+            // Remove backslash from \" in double quoted values.
+            else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"'));
+            else if (m3 !== undefined) a.push(m3);
+            return ''; // Return empty string.
+        });
+    // Handle special case of empty last value.
+    if (/,\s*$/.test(text)) a.push('');
+    return a;
+}
+
 function fetch(downloadUrl, cb) {
 	function getOptions() {
 		if (process.env.http_proxy) {
@@ -150,7 +172,7 @@ function extract(tmpFile, tmpFileName, cb) {
 function processCountryData(src, dest, cb) {
 	var lines=0;
 	function processLine(line) {
-		var fields = line.split(/, */);
+		var fields = CSVtoArray(line);
 
 		if (fields.length < 6) {
 			console.log("weird line: %s::", line);
@@ -231,7 +253,7 @@ function processCityData(src, dest, cb) {
 			return;
 		}
 
-		var fields = line.replace(/"/g, '').split(/, */);
+		var fields = CSVtoArray(line);
 		var sip;
 		var eip;
 		var locId;
@@ -321,7 +343,7 @@ function processCityDataNames(src, dest, cb) {
 			return;
 		}
 
-		var fields = line.replace(/"/g, '').split(/, */);
+		var fields = CSVtoArray(line);
 		var cc = fields[1];
 		var rg = fields[2];
 		var city = fields[3];
