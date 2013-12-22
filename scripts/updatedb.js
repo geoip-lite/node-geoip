@@ -418,5 +418,6 @@ async.forEachSeries(databases, function(database, nextDatabase) {
 		process.exit();
 	} else {
 		console.log('Successfully Updated Databases from MaxMind.'.green);
+		rimraf(tmpPath);
 	}
 });
