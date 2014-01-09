@@ -418,5 +418,7 @@ async.forEachSeries(databases, function(database, nextDatabase) {
 		process.exit();
 	} else {
 		console.log('Successfully Updated Databases from MaxMind.'.green);
+		if (process.argv[2]=='debug') console.log('Notice: temporary files are not deleted for debug purposes.'.bold.yellow);
+		else rimraf(tmpPath);
 	}
 });
