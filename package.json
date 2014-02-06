@@ -13,6 +13,7 @@
 		"test": "nodeunit --reporter=minimal test/tests.js",
 		"updatedb": "node scripts/updatedb.js",
 		"updatedb-debug": "node scripts/updatedb.js debug",
+		"geoip-server": "node scripts/geoip-server.js",
 		"postinstall": "npm run-script updatedb"
 	},
 	"dependencies": {
