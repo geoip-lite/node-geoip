@@ -2,23 +2,22 @@
 
 'use strict';
 
-var cp = require('child_process');
-var fs = require('fs');
-var http = require('http');
-var path = require('path');
-var url = require('url');
-var zlib = require('zlib');
+var fs = require('fs'),
+	http = require('http'),
+	path = require('path'),
+	url = require('url'),
+	zlib = require('zlib');
 
 fs.existsSync = fs.existsSync || path.existsSync;
 
-var async = require('async');
-var colors = require('colors');
-var glob = require('glob');
-var iconv = require('iconv-lite');
-var lazy = require('lazy');
-var rimraf = require('rimraf').sync;
-var unzip = require('unzip');
-var utils = require('../lib/utils');
+var async = require('async'),
+	colors = require('colors'),
+	glob = require('glob'),
+	iconv = require('iconv-lite'),
+	lazy = require('lazy'),
+	rimraf = require('rimraf').sync,
+	unzip = require('unzip'),
+	utils = require('../lib/utils');
 
 var dataPath = path.join(__dirname, '..', 'data');
 var tmpPath = path.join(__dirname, '..', 'tmp');
