@@ -1,3 +1,12 @@
+// Download Geoip dat files from intermediate server
+// 
+// Run in command line from your project directory:
+//   npm run-script geoip-lite getdb
+//
+// Or run in command line from /node_modules/geoip-lite directory:
+//   npm run-script getdb
+//
+
 var http = require('http'),
 	path = require('path'),
 	fs = require('fs'),

@@ -1,3 +1,12 @@
+// Geoip intermediate server
+// 
+// Run in command line from your project directory:
+//   npm run-script geoip-lite geoip-server
+//
+// Or run in command line from /node_modules/geoip-lite directory:
+//   npm run-script geoip-server
+//
+
 var fs    = require('fs'),
 	url   = require('url'),
 	http  = require('http'),
@@ -29,6 +38,7 @@ function scheduleUpdate() {
 		});
 	}
 	var nextCheck = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0) - now + dayMilliseconds;
+	
 	scheduleTimer = setTimeout(scheduleUpdate, nextCheck);
 };
 
@@ -94,7 +104,7 @@ var server = http.createServer(function(req, res) {
 
 server.on('error', function(e) {
 	if (e.code == 'EADDRINUSE' || e.code == 'EACCESS' || e.code == 'EACCES') {
-		console.log('Can`t bind to host/port'.red);
+		console.log('Can\'t bind to host/port'.red);
 		process.exit();
 	}
 });

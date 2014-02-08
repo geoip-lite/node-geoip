@@ -1,4 +1,14 @@
-// fetches and converts maxmind lite databases
+// Fetches and converts MaxMind lite databases
+// 
+// Run in command line from your project directory:
+//   npm run-script geoip-lite updatedb
+//
+// Or run in command line from /node_modules/geoip-lite directory:
+//   npm run-script updatedb
+//
+// For debug purpose you can leave source csv files after dat files generation:
+//   npm run-script updatedb-debug
+//
 
 'use strict';
 
@@ -19,8 +29,8 @@ var async = require('async'),
 	unzip = require('unzip'),
 	utils = require('../lib/utils');
 
-var dataPath = path.join(__dirname, '..', 'data');
-var tmpPath = path.join(__dirname, '..', 'tmp');
+var dataPath = path.join(__dirname, '..', 'data'),
+	tmpPath = path.join(__dirname, '..', 'tmp');
 
 var databases = [{
 	type: 'country',
@@ -60,23 +70,23 @@ function mkdir(name) {
 // Ref: http://stackoverflow.com/questions/8493195/how-can-i-parse-a-csv-string-with-javascript
 // Return array of string values, or NULL if CSV string not well formed.
 function CSVtoArray(text) {
-    var re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
-    var re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
-    // Return NULL if input string is not well formed CSV string.
-    if (!re_valid.test(text)) return null;
-    var a = [];                     // Initialize array to receive values.
-    text.replace(re_value, // "Walk" the string using replace with callback.
-        function(m0, m1, m2, m3) {
-            // Remove backslash from \' in single quoted values.
-            if      (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
-            // Remove backslash from \" in double quoted values.
-            else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"'));
-            else if (m3 !== undefined) a.push(m3);
-            return ''; // Return empty string.
-        });
-    // Handle special case of empty last value.
-    if (/,\s*$/.test(text)) a.push('');
-    return a;
+	var re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
+	var re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
+	// Return NULL if input string is not well formed CSV string.
+	if (!re_valid.test(text)) return null;
+	var a = [];            // Initialize array to receive values.
+	text.replace(re_value, // "Walk" the string using replace with callback.
+		function(m0, m1, m2, m3) {
+			// Remove backslash from \' in single quoted values.
+			if      (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
+			// Remove backslash from \" in double quoted values.
+			else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"'));
+			else if (m3 !== undefined) a.push(m3);
+			return ''; // Return empty string.
+		});
+	// Handle special case of empty last value.
+	if (/,\s*$/.test(text)) a.push('');
+	return a;
 }
 
 function fetch(downloadUrl, cb) {

@@ -131,7 +131,7 @@ A npm script alias has been setup to make this process easy. Please keep in mind
 rate limits that amount of downloads on thier servers.
 
 ```shell
-npm run-script updatedb
+npm run-script geoip-lite updatedb
 ```
 
 Caveats
