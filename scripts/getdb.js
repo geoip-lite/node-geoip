@@ -7,16 +7,17 @@
 //   npm run-script getdb
 //
 
-var http = require('http'),
-	path = require('path'),
-	fs = require('fs'),
-	async = require('async'),
-	colors = require('colors');
+var fs = require('fs');
+var http = require('http');
+var path = require('path');
+var zlib = require('zlib');
+var async = require('async');
+var colors = require('colors');
 
-var config = require('./config.js');
+var config = require('../config.js');
 
-var dirModule = path.join(__dirname, '..'),
-	dirData = path.join(dirModule, 'data');
+var dirModule = path.join(__dirname, '..');
+var dirData = path.join(dirModule, 'data');
 
 var files = [
 	'geoip-city-names.dat',
@@ -27,12 +28,14 @@ var files = [
 ];
 
 async.forEachSeries(files, function(fileName, callback) {
-	var req = http.get('http://'+config.host+':'+config.port+'/'+fileName);
+	var req = http.get('http://'+config.intermediateServer.host+':'+config.intermediateServer.port+'/'+fileName);
 	req.on('response', function(res){
 		var filePath = path.join(dirData, fileName);
 		console.log('Loading file: '+fileName);
 		var ws = fs.createWriteStream(filePath);
-		res.pipe(ws);
+		var gunzip = zlib.createGunzip();
+		res.pipe(gunzip);
+		gunzip.pipe(ws);
 		res.on('end', callback);
 	});
 }, function() {

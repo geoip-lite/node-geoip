@@ -7,40 +7,41 @@
 //   npm run-script geoip-server
 //
 
-var fs    = require('fs'),
-	url   = require('url'),
-	http  = require('http'),
-	path  = require('path'),
-	zlib  = require('zlib'),
-	fork = require('child_process').fork,
-	async = require('async'),
-	colors = require('colors');
+var fs = require('fs');
+var url = require('url');
+var http = require('http');
+var path = require('path');
+var zlib = require('zlib');
+var fork = require('child_process').fork;
+var async = require('async');
+var colors = require('colors');
 
-var config = require('./config.js'),
-	cu = require('./common-utils.js');
+var config = require('../config.js');
+var utils = require('../lib/utils.js');
 
-var dayMilliseconds = 86400000,
-	dirModule = path.join(__dirname, '..'),
-	dirData = path.join(dirModule, 'data'),
-	fileCache, scheduleTimer;
+var dayMilliseconds = 86400000;
+var dirModule = path.join(__dirname, '..');
+var dirData = path.join(dirModule, 'data');
+var fileCache, scheduleTimer;
 
-// Schedule update from MaxMind and rebuild data files
-// MaxMind updates first Tuesday of each month, we will update first Wednesday
+// Update from MaxMind and rebuild data files
+//
+function updateDatabase() {
+	console.log('Start scheduled update from MaxMind and rebuild data files'.green.bold);
+	var updatedb = fork(path.join(__dirname, 'updatedb.js'), { cwd: dirModule });
+	updatedb.on('exit', function (code) {
+		console.log('Rebuild memory cache: ');
+		prepareMemoryCache();
+	});
+}
+
+// Schedule update (MaxMind updates first Tuesday of each month, we will update first Wednesday)
 //
 function scheduleUpdate() {
 	var now = new Date();
-	if (now.getUTCDate() <=7 && now.getUTCDay() == 3) {
-		console.log('Start scheduled update from MaxMind and rebuild data files'.green.bold);
-		var updatedb = fork(path.join(__dirname, 'updatedb.js'), { cwd: dirModule });
-		updatedb.on('exit', function (code) {
-			console.log('Rebuild memory cache: ');
-			prepareMemoryCache();
-		});
-	}
-	var nextCheck = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0) - now + dayMilliseconds;
-	
-	scheduleTimer = setTimeout(scheduleUpdate, nextCheck);
-};
+	if (now.getUTCDate() <=7 && now.getUTCDay() == 3) setTimeout(updateDatabase, utils.random(config.spreadLoad.toMaxMindServer));
+	scheduleTimer = setTimeout(scheduleUpdate, utils.nextCheck());
+}
 
 // Read directory /data and create gzipped memory cache
 //
@@ -56,8 +57,8 @@ function prepareMemoryCache() {
 							var fileSize = data.length;
 							zlib.gzip(data, function(err, data) {
 								console.log(
-									'Load file: '+fileName.yellow+', size: '+cu.bytesToSize(fileSize)+
-									', gzipped: '+cu.bytesToSize(data.length)+
+									'Load file: '+fileName.yellow+', size: '+utils.bytesToSize(fileSize)+
+									', gzipped: '+utils.bytesToSize(data.length)+
 									', ratio: '+Math.round(100*data.length/fileSize)+'%'
 								);
 								fileCache[fileName] = data;
@@ -76,7 +77,7 @@ function prepareMemoryCache() {
 			);
 		} else console.log('Error reading rirectory '+dirData.red);
 	});
-};
+}
 
 // Initial cache loading
 //
@@ -85,8 +86,8 @@ prepareMemoryCache();
 // Start HTTP server with no disk operations, all data serves from gzipped memory cache
 //
 var server = http.createServer(function(req, res) {
-	var fileName = url.parse(req.url).pathname.substring(1),
-		cacheData = fileCache[fileName];
+	var fileName = url.parse(req.url).pathname.substring(1);
+	var cacheData = fileCache[fileName];
 	if (cacheData) {
 		res.writeHead(200, {
 			'Transfer-Encoding': 'chunked',
@@ -109,5 +110,5 @@ server.on('error', function(e) {
 	}
 });
 
-server.listen(config.port, config.host);
-console.log('Listen on '+(config.host+':'+config.port).yellow.bold);
+server.listen(config.intermediateServer.port, config.intermediateServer.host);
+console.log('Listen on '+(config.intermediateServer.host+':'+config.intermediateServer.port).yellow.bold);
