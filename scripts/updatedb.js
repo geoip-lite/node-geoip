@@ -111,17 +111,14 @@ function fetch(downloadUrl, cb) {
 		if (status !== 200) {
 			console.log('ERROR'.red + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 			client.abort();
-			process.exit();
+			process.exit(1);
 		}
 
 		var tmpFilePipe;
 		var tmpFileStream = fs.createWriteStream(tmpFile);
 
-		if (gzip) {
-			tmpFilePipe = response.pipe(zlib.createGunzip()).pipe(tmpFileStream);
-		} else {
-			tmpFilePipe = response.pipe(tmpFileStream);
-		}
+		if (gzip) tmpFilePipe = response.pipe(zlib.createGunzip()).pipe(tmpFileStream);
+		else tmpFilePipe = response.pipe(tmpFileStream);
 
 		tmpFilePipe.on('close', function() {
 			console.log(' DONE'.green);
@@ -132,12 +129,9 @@ function fetch(downloadUrl, cb) {
 	var fileName = downloadUrl.split('/').pop();
 	var gzip = (fileName.indexOf('.gz') !== -1);
 
-	if (gzip) {
-		fileName = fileName.replace('.gz', '');
-	}
+	if (gzip) fileName = fileName.replace('.gz', '');
 
 	var tmpFile = path.join(tmpPath, fileName);
-
 	mkdir(tmpFile);
 
 	var client = http.get(getOptions(), onResponse);
@@ -258,9 +252,7 @@ function processCountryData(src, dest, cb) {
 function processCityData(src, dest, cb) {
 	var lines = 0;
 	function processLine(line) {
-		if (line.match(/^Copyright/) || !line.match(/\d/)) {
-			return;
-		}
+		if (line.match(/^Copyright/) || !line.match(/\d/)) return;
 
 		var fields = CSVtoArray(line);
 		var sip;
@@ -376,7 +368,6 @@ function processCityDataNames(src, dest, cb) {
 	var tmpDataFile = path.join(tmpPath, src);
 
 	rimraf(dataFile);
-
 	var datFile = fs.openSync(dataFile, "w");
 
 	lazy(fs.createReadStream(tmpDataFile))
@@ -421,10 +412,9 @@ async.forEachSeries(databases, function(database, nextDatabase) {
 	});
 }, function(err) {
 	console.log();
-
 	if (err) {
 		console.log('Failed to Update Databases from MaxMind.'.red);
-		process.exit();
+		process.exit(1);
 	} else {
 		console.log('Successfully Updated Databases from MaxMind.'.green);
 		if (process.argv[2]=='debug') console.log('Notice: temporary files are not deleted for debug purposes.'.bold.yellow);

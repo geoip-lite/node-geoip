@@ -23,6 +23,7 @@ var dayMilliseconds = 86400000;
 var dirModule = path.join(__dirname, '..');
 var dirData = path.join(dirModule, 'data');
 var fileCache = [];
+var fileList = {};
 var scheduleTimer;
 
 // Update from MaxMind and rebuild data files
@@ -64,6 +65,7 @@ function prepareMemoryCache() {
 											', ratio: '+Math.round(100*data.length/fileSize)+'%'
 										);
 										fileCache[fileName] = { data:data, time:stats.mtime };
+										fileList[fileName] = { size:fileSize, gzipped:data.length, time:stats.mtime.getTime() };
 										callback();
 									});
 								} else {
@@ -94,25 +96,33 @@ prepareMemoryCache();
 //
 var server = http.createServer(function(req, res) {
 	var fileName = url.parse(req.url).pathname.substring(1);
-	var cache = fileCache[fileName];
-	if (cache) {
-		var sinceTime = req.headers['if-modified-since'];
-		if (sinceTime && (new Date(cache.time)).getTime() < (new Date(sinceTime)).getTime()) {
-			res.statusCode = 304;
-			res.end();
-		} else {
-			res.writeHead(200, {
-				'Transfer-Encoding': 'chunked',
-				'Content-Type': 'application/octet-stream',
-				'Cache-Control': 'public',
-				'Content-Length': cache.data.length,
-				'Content-encoding': 'gzip'
-			});
-			res.end(cache.data);
-		}
+	if (fileName == "") {
+		res.writeHead(200, {
+			'Transfer-Encoding': 'chunked',
+			'Content-Type': 'application/json'
+		});
+		res.end(JSON.stringify(fileList));
 	} else {
-		res.statusCode = 404;
-		res.end();
+		var cache = fileCache[fileName];
+		if (cache) {
+			var sinceTime = req.headers['if-modified-since'];
+			if (sinceTime && (new Date(cache.time)).getTime() < (new Date(sinceTime)).getTime()) {
+				res.statusCode = 304;
+				res.end();
+			} else {
+				res.writeHead(200, {
+					'Transfer-Encoding': 'chunked',
+					'Content-Type': 'application/octet-stream',
+					'Cache-Control': 'public',
+					'Content-Length': cache.data.length,
+					'Content-encoding': 'gzip'
+				});
+				res.end(cache.data);
+			}
+		} else {
+			res.statusCode = 404;
+			res.end();
+		}
 	}
 });
 
