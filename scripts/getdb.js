@@ -28,16 +28,36 @@ var files = [
 ];
 
 async.forEachSeries(files, function(fileName, callback) {
-	var req = http.get('http://'+config.intermediateServer.host+':'+config.intermediateServer.port+'/'+fileName);
-	req.on('response', function(res){
+	if (fileName) {
 		var filePath = path.join(dirData, fileName);
-		console.log('Loading file: '+fileName);
-		var ws = fs.createWriteStream(filePath);
-		var gunzip = zlib.createGunzip();
-		res.pipe(gunzip);
-		gunzip.pipe(ws);
-		res.on('end', callback);
-	});
+		fs.stat(filePath, function(err, stats) {
+			var options = {
+				hostname: config.intermediateServer.host,
+				port: config.intermediateServer.port,
+				path: '/'+fileName
+			};
+			if (!err) options['headers'] = { 'If-Modified-Since': new Date(stats.mtime).toUTCString() };
+			var req = http.request(options, function (res) {
+				var gunzip = zlib.createGunzip();
+				if (res.statusCode == 200) {
+					console.log('Loading file: '+fileName);
+					var ws = fs.createWriteStream(filePath);
+					res.pipe(gunzip);
+					gunzip.pipe(ws);
+					res.on('end', callback);
+				} else {
+					console.log('File is not modified: '+fileName);
+					res.pipe(gunzip);
+				}
+				res.on('end', callback);
+			});
+			req.on('error', function(e) {
+				console.log('Request error: ' + e.message);
+				callback();
+			});
+			req.end();
+		});
+	}
 }, function() {
 	console.log('Successfully Updated Databases from intermediate server.'.green);
 });

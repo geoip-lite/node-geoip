@@ -22,7 +22,8 @@ var utils = require('../lib/utils.js');
 var dayMilliseconds = 86400000;
 var dirModule = path.join(__dirname, '..');
 var dirData = path.join(dirModule, 'data');
-var fileCache, scheduleTimer;
+var fileCache = [];
+var scheduleTimer;
 
 // Update from MaxMind and rebuild data files
 //
@@ -46,26 +47,32 @@ function scheduleUpdate() {
 // Read directory /data and create gzipped memory cache
 //
 function prepareMemoryCache() {
-	fileCache = [];
 	fs.readdir(dirData, function(err, files) {
 		if (!err) {
 			async.forEach(files,
 				function(fileName, callback) {
 					var filePath = path.join(dirData, fileName);
-					fs.readFile(filePath, function(err, data) {
+					fs.stat(filePath, function(err, stats) {
 						if (!err) {
-							var fileSize = data.length;
-							zlib.gzip(data, function(err, data) {
-								console.log(
-									'Load file: '+fileName.yellow+', size: '+utils.bytesToSize(fileSize)+
-									', gzipped: '+utils.bytesToSize(data.length)+
-									', ratio: '+Math.round(100*data.length/fileSize)+'%'
-								);
-								fileCache[fileName] = data;
-								callback();
+							fs.readFile(filePath, function(err, data) {
+								if (!err) {
+									var fileSize = data.length;
+									zlib.gzip(data, function(err, data) {
+										console.log(
+											'Load file: '+fileName.yellow+', size: '+utils.bytesToSize(fileSize)+
+											', gzipped: '+utils.bytesToSize(data.length)+
+											', ratio: '+Math.round(100*data.length/fileSize)+'%'
+										);
+										fileCache[fileName] = { data:data, time:stats.mtime };
+										callback();
+									});
+								} else {
+									console.log('File read error: '+fileName.red);
+									callback();
+								}
 							});
 						} else {
-							console.log('File read error: '+fileName.red);
+							console.log('Error reading file mtime: '+fileName.red);
 							callback();
 						}
 					});
@@ -87,16 +94,22 @@ prepareMemoryCache();
 //
 var server = http.createServer(function(req, res) {
 	var fileName = url.parse(req.url).pathname.substring(1);
-	var cacheData = fileCache[fileName];
-	if (cacheData) {
-		res.writeHead(200, {
-			'Transfer-Encoding': 'chunked',
-			'Content-Type': 'application/octet-stream',
-			'Cache-Control': 'public',
-			'Content-Length': cacheData.length,
-			'Content-encoding': 'gzip'
-		});
-		res.end(cacheData);
+	var cache = fileCache[fileName];
+	if (cache) {
+		var sinceTime = req.headers['if-modified-since'];
+		if (sinceTime && (new Date(cache.time)).getTime() < (new Date(sinceTime)).getTime()) {
+			res.statusCode = 304;
+			res.end();
+		} else {
+			res.writeHead(200, {
+				'Transfer-Encoding': 'chunked',
+				'Content-Type': 'application/octet-stream',
+				'Cache-Control': 'public',
+				'Content-Length': cache.data.length,
+				'Content-encoding': 'gzip'
+			});
+			res.end(cache.data);
+		}
 	} else {
 		res.statusCode = 404;
 		res.end();
