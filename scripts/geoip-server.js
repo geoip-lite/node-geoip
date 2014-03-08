@@ -19,7 +19,6 @@ var colors = require('colors');
 var config = require('../config.js');
 var utils = require('../lib/utils.js');
 
-var dayMilliseconds = 86400000;
 var dirModule = path.join(__dirname, '..');
 var dirData = path.join(dirModule, 'data');
 var fileCache = [];
