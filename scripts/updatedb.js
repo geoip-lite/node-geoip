@@ -24,6 +24,11 @@ var dataPath = path.join(__dirname, '..', 'data');
 var tmpPath = path.join(__dirname, '..', 'tmp');
 
 var databases = [{
+	type: 'country-codes',
+	url: 'http://dev.maxmind.com/static/csv/codes/iso3166.csv',
+	src: 'iso3166.csv',
+	dest: 'geoip-country-names.json'
+},{
 	type: 'country',
 	url: 'http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip',
 	src: 'GeoIPCountryWhois.csv',
@@ -380,8 +385,46 @@ function processCityDataNames(src, dest, cb) {
 		.on('pipe', cb);
 }
 
+function processCountryCodes(src, dest, cb) {
+	var countries = {};
+
+	function processLine(line, i, a) {
+		var fields = CSVtoArray(line);
+		var code = fields[0];
+		var name = fields[1];
+
+		countries[code] = name;
+	}
+
+	var dataFile = path.join(dataPath, dest);
+	var tmpDataFile = path.join(tmpPath, src);
+
+	rimraf(dataFile);
+
+	var datFile = fs.openSync(dataFile, "w");
+
+	lazy(fs.createReadStream(tmpDataFile))
+		.lines
+		.map(function(byteArray) {
+			return iconv.decode(byteArray, 'latin1');
+		})
+		.map(processLine)
+		.on('pipe', function(err, val){
+			if(err){
+				cb(err);
+			}else{
+				fs.writeFile(dataFile, JSON.stringify(countries), cb);
+			}
+		});
+}
+
 function processData(type, src, dest, cb) {
-	if (type === 'country') {
+	if(type === 'country-codes'){
+		processCountryCodes(src, dest, function(){
+			console.log(' DONE'.green);
+			cb();			
+		});
+	}else if (type === 'country') {
 		processCountryData(src, dest, cb);
 	} else if (type === 'city-extended') {
 		processCityData(src[0], dest[0], function() {

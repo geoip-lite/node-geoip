@@ -1,6 +1,16 @@
 var geoip = require('../lib/geoip');
 
 module.exports = {
+	testCountry: function(test){
+		test.expect(1);
+
+		var actual = geoip.countryName('US');
+
+		test.equal(actual, 'United States', 'should return US');
+
+		test.done();
+	},
+
 	testLookup: function(test) {
 		test.expect(2);
 
@@ -22,7 +32,7 @@ module.exports = {
 		test.expect(2);
 
 		var ip = "31.17.105.227";
-		var expected = "Todenbüttel";
+		var expected = "Neumünster";
 		var actual = geoip.lookup(ip);
 
 		test.ok(actual, "Should return a non-null value for " + ip);
