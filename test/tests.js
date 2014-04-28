@@ -19,15 +19,19 @@ module.exports = {
 	},
 
 	testRegionName: function(test){
-		test.expect(2);
+		test.expect(3);
 
 		var actual = geoip.regionName('AF', '06');
 
 		test.ok(actual, 'Farah');
 
-		var actual = geoip.regionName('AF', 6);
+		actual = geoip.regionName('AF', 6);
 
 		test.ok(actual, 'Farah');
+
+		actual = geoip.regionName('US', 'AL');
+
+		test.ok(actual, 'Alabama');
 
 		test.done();
 	},

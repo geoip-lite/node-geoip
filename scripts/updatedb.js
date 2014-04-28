@@ -346,10 +346,6 @@ function processRegionCodes(src, dest, cb) {
 	var regions = {};
 
 	function processLine(line, i, a) {
-		if (line.match(/^Copyright/) || !line.match(/\d/)) {
-			return;
-		}
-
 		var fields = CSVtoArray(line);
 		var country = fields[0];
 		var region = fields[1];
@@ -381,6 +377,7 @@ function processRegionCodes(src, dest, cb) {
 			if(err){
 				cb(err);
 			}else{
+				console.log(regions);
 				fs.writeFile(dataFile, JSON.stringify(regions), cb);
 			}
 		});
