@@ -18,6 +18,20 @@ module.exports = {
 		test.done();
 	},
 
+	testRegionName: function(test){
+		test.expect(2);
+
+		var actual = geoip.regionName('AF', '06');
+
+		test.ok(actual, 'Farah');
+
+		var actual = geoip.regionName('AF', 6);
+
+		test.ok(actual, 'Farah');
+
+		test.done();
+	},
+
 	testUTF8: function(test) {
 		test.expect(2);
 

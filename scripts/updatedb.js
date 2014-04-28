@@ -49,6 +49,11 @@ var databases = [{
 	url: 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.csv.gz',
 	src: 'GeoLiteCityv6.csv',
 	dest: 'geoip-city6.dat'
+},{
+	type: 'region',
+	url: 'http://www.maxmind.com/download/geoip/misc/region_codes.csv',
+	src: 'region_codes.csv',
+	dest: 'geoip-region-names.json'
 }];
 
 function mkdir(name) {
@@ -337,6 +342,50 @@ function processCityData(src, dest, cb) {
 		.on('pipe', cb);
 }
 
+function processRegionCodes(src, dest, cb) {
+	var regions = {};
+
+	function processLine(line, i, a) {
+		if (line.match(/^Copyright/) || !line.match(/\d/)) {
+			return;
+		}
+
+		var fields = CSVtoArray(line);
+		var country = fields[0];
+		var region = fields[1];
+		var name = fields[2];
+
+		if(!regions[country]){
+			regions[country] = {};
+		}
+
+		if(!regions[country][region]){
+			regions[country][region] = name;
+		}
+	}
+
+	var dataFile = path.join(dataPath, dest);
+	var tmpDataFile = path.join(tmpPath, src);
+
+	rimraf(dataFile);
+
+	var datFile = fs.openSync(dataFile, "w");
+
+	lazy(fs.createReadStream(tmpDataFile))
+		.lines
+		.map(function(byteArray) {
+			return iconv.decode(byteArray, 'latin1');
+		})
+		.map(processLine)
+		.on('pipe', function(err, val){
+			if(err){
+				cb(err);
+			}else{
+				fs.writeFile(dataFile, JSON.stringify(regions), cb);
+			}
+		});
+}
+
 function processCityDataNames(src, dest, cb) {
 	function processLine(line, i, a) {
 		if (line.match(/^Copyright/) || !line.match(/\d/)) {
@@ -389,6 +438,11 @@ function processData(type, src, dest, cb) {
 				console.log(' DONE'.green);
 				cb();
 			});
+		});
+	} else if (type === 'region') {
+		processRegionCodes(src, dest, function(){
+			console.log(' DONE'.green);
+			cb();			
 		});
 	} else {
 		processCityData(src, dest, function() {
