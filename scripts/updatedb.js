@@ -377,7 +377,6 @@ function processRegionCodes(src, dest, cb) {
 			if(err){
 				cb(err);
 			}else{
-				console.log(regions);
 				fs.writeFile(dataFile, JSON.stringify(regions), cb);
 			}
 		});
