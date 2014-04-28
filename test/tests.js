@@ -23,15 +23,15 @@ module.exports = {
 
 		var actual = geoip.regionName('AF', '06');
 
-		test.ok(actual, 'Farah');
+		test.equal(actual, 'Farah');
 
 		actual = geoip.regionName('AF', 6);
 
-		test.ok(actual, 'Farah');
+		test.equal(actual, 'Farah');
 
 		actual = geoip.regionName('US', 'AL');
 
-		test.ok(actual, 'Alabama');
+		test.equal(actual, 'Alabama');
 
 		test.done();
 	},
