@@ -36,7 +36,7 @@ module.exports = {
 		test.expect(2);
 
 		var ip = "31.17.105.227";
-		var expected = "Todenbüttel";
+		var expected = "Neumünster";
 		var actual = geoip.lookup(ip);
 
 		test.ok(actual, "Should return a non-null value for " + ip);
