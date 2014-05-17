@@ -2,6 +2,10 @@
 
 'use strict';
 
+if(!process.env.npm_package_config_update){
+	return;
+}
+
 console.log(process.env);
 process.exit(1);
 
