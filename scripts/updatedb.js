@@ -2,6 +2,9 @@
 
 'use strict';
 
+console.log(process.env);
+process.exit(1);
+
 var cp = require('child_process');
 var fs = require('fs');
 var http = require('http');
