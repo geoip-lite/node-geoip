@@ -134,6 +134,12 @@ rate limits that amount of downloads on thier servers.
 npm run-script updatedb
 ```
 
+The update will run every time npm install/update is invoked, you can disable this by executing:
+
+```
+npm config set geoip-lite:update false
+```
+
 Caveats
 -------
 

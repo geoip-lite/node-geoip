@@ -6,9 +6,6 @@ if(!process.env.npm_package_config_update){
 	return;
 }
 
-console.log(process.env);
-process.exit(1);
-
 var cp = require('child_process');
 var fs = require('fs');
 var http = require('http');
