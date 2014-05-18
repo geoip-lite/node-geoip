@@ -24,6 +24,9 @@
 		"rimraf": "~2.0.2",
 		"unzip": "~0.0.4"
 	},
+	"config": {
+		"update": true
+	},
 	"devDependencies": {
 		"nodeunit": "~0.7.4"
 	}

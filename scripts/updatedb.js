@@ -2,6 +2,10 @@
 
 'use strict';
 
+if(!process.env.npm_package_config_update){
+	return;
+}
+
 var cp = require('child_process');
 var fs = require('fs');
 var http = require('http');
