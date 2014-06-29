@@ -370,8 +370,12 @@ function processCityDataNames(src, dest, cb) {
 		b.write(rg, 2);
 		b.writeInt32BE(lat, 4);
 		b.writeInt32BE(lon, 8);
-		b.write(city, 12);
-		b.writeInt32BE(metro, 32);
+
+		if(metro){
+			b.writeInt32BE(metro, 12);
+		}
+
+		b.write(city, 16);
 
 		fs.writeSync(datFile, b, 0, b.length, null);
 	}
