@@ -6,6 +6,8 @@ if(!process.env.npm_package_config_update){
 	return;
 }
 
+var user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36';
+
 var cp = require('child_process');
 var fs = require('fs');
 var http = require('http');
@@ -96,7 +98,12 @@ function fetch(downloadUrl, cb) {
 
 			return options;
 		} else {
-			return url.parse(downloadUrl);
+			var options = url.parse(downloadUrl);
+			options.headers = {
+				'Host': url.parse(downloadUrl).host,
+				'User-Agent': user_agent
+			};
+			return options;
 		}
 	}
 
@@ -363,8 +370,12 @@ function processCityDataNames(src, dest, cb) {
 		b.write(rg, 2);
 		b.writeInt32BE(lat, 4);
 		b.writeInt32BE(lon, 8);
-		b.write(city, 12);
-		b.writeInt32BE(metro, 32);
+
+		if(metro){
+			b.writeInt32BE(metro, 12);
+		}
+
+		b.write(city, 16);
 
 		fs.writeSync(datFile, b, 0, b.length, null);
 	}
