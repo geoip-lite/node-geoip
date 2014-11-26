@@ -349,20 +349,32 @@ function processCityData(src, dest, cb) {
 }
 
 function processCityDataNames(src, dest, cb) {
+	var locId = null;
+
 	function processLine(line, i, a) {
 		if (line.match(/^Copyright/) || !line.match(/\d/)) {
 			return;
 		}
 
+		var b;
+		var sz = 64;
 		var fields = CSVtoArray(line);
+		if (locId === null)
+			locId = parseInt(fields[0]);
+		else {
+			if (parseInt(fields[0]) - 1 > locId) {
+				b = new Buffer(sz);
+				b.fill(0);
+				fs.writeSync(datFile, b, 0, b.length, null);
+			}
+			locId = parseInt(fields[0]);
+		}
 		var cc = fields[1];
 		var rg = fields[2];
 		var city = fields[3];
 		var lat = Math.round(parseFloat(fields[5]) * 10000);
 		var lon = Math.round(parseFloat(fields[6]) * 10000);
 		var metro = parseInt(fields[7]);
-		var b;
-		var sz = 64;
 
 		b = new Buffer(sz);
 		b.fill(0);
