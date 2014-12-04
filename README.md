@@ -64,6 +64,11 @@ Then download the city data files from https://github.com/bluesmoon/node-geoip/t
 You need to get `geoip-city.dat` and `geoip-city-names.dat` and put them into the `data/` directory
 of this package.
 
+You could also run `npm run-script updatedb` to do this automatically.
+
+**NOTE** that this requires a lot of RAM.  It is known to fail on on a Digital Ocean or AWS micro instance.
+There are no plans to change this.  `geoip-lite` stores all data in RAM in order to be fast.
+
 API
 ---
 
@@ -132,12 +137,6 @@ rate limits that amount of downloads on thier servers.
 
 ```shell
 npm run-script updatedb
-```
-
-The update will run every time npm install/update is invoked, you can disable this by executing:
-
-```
-npm config set geoip-lite:update false
 ```
 
 Caveats
