@@ -133,7 +133,7 @@ Built-in Updater
 
 This package contains an update script that can pull the files from MaxMind and handle the conversion from CSV.
 A npm script alias has been setup to make this process easy. Please keep in mind this requires internet and MaxMind
-rate limits that amount of downloads on thier servers.
+rate limits that amount of downloads on their servers.
 
 ```shell
 npm run-script updatedb
