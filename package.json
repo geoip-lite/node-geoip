@@ -1,32 +1,51 @@
 {
-	"name"        :  "geoip-lite",
-	"version"     :  "1.1.6",
-	"description" :  "A light weight native JavaScript implementation of GeoIP API from MaxMind",
-	"keywords"    :  ["geo", "geoip", "ip", "ipv4", "ipv6", "geolookup", "maxmind", "geolite"],
-	"homepage"    :  "https://github.com/bluesmoon/node-geoip",
-	"author"      :  "Philip Tellis <philip@bluesmoon.info> (http://bluesmoon.info/)",
-	"files"       :  ["lib/", "data/", "test/","scripts/"],
-	"main"        :  "lib/geoip.js",
-	"repository"  :  { "type": "git", "url": "git://github.com/bluesmoon/node-geoip.git" },
-	"engines"     :  { "node": ">=0.6.3" },
-	"scripts": {
-		"test": "nodeunit --reporter=minimal test/tests.js",
-		"updatedb": "node scripts/updatedb.js",
-		"updatedb-debug": "node scripts/updatedb.js debug"
-	},
-	"dependencies": {
-		"async": "~1.3.0",
-		"colors": "0.6.0-1",
-		"glob": "~3.2.1",
-		"iconv-lite": "~0.4.7",
-		"lazy": "~1.0.11",
-		"rimraf": "~2.0.2",
-		"unzip": "~0.0.4"
-	},
-	"config": {
-		"update": true
-	},
-	"devDependencies": {
-		"nodeunit": "~0.7.4"
-	}
+  "name": "geoip-lite",
+  "version": "1.1.6",
+  "description": "A light weight native JavaScript implementation of GeoIP API from MaxMind",
+  "keywords": [
+    "geo",
+    "geoip",
+    "ip",
+    "ipv4",
+    "ipv6",
+    "geolookup",
+    "maxmind",
+    "geolite"
+  ],
+  "homepage": "https://github.com/bluesmoon/node-geoip",
+  "author": "Philip Tellis <philip@bluesmoon.info> (http://bluesmoon.info/)",
+  "files": [
+    "lib/",
+    "data/",
+    "test/",
+    "scripts/"
+  ],
+  "main": "lib/geoip.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bluesmoon/node-geoip.git"
+  },
+  "engines": {
+    "node": ">=0.6.3"
+  },
+  "scripts": {
+    "test": "nodeunit --reporter=minimal test/tests.js",
+    "updatedb": "node scripts/updatedb.js",
+    "updatedb-debug": "node scripts/updatedb.js debug"
+  },
+  "dependencies": {
+    "async": "~1.3.0",
+    "colors": "0.6.0-1",
+    "glob": "~3.2.1",
+    "iconv-lite": "~0.4.7",
+    "lazy": "~1.0.11",
+    "rimraf": "~2.0.2",
+    "unzip": "^0.1.11"
+  },
+  "config": {
+    "update": true
+  },
+  "devDependencies": {
+    "nodeunit": "~0.7.4"
+  }
 }
