@@ -157,9 +157,13 @@ function extract(tmpFile, tmpFileName, cb) {
 			path: path.dirname(tmpFile)
 		});
 
-		var pipeSteam = fs.createReadStream(tmpFile).pipe(unzipStream);
+		fs.createReadStream(tmpFile).pipe(unzipStream);
 
-		pipeSteam.on('end', function() {
+  	unzipStream.on('error', function(err) {
+    	throw err;
+  	});
+
+		unzipStream.on('close', function() {
 			console.log(' DONE'.green);
 
 			if (tmpFileName.indexOf('GeoLiteCity') !== -1) {
