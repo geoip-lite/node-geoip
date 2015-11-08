@@ -21,7 +21,7 @@ module.exports = {
 	testUTF8: function(test) {
 		test.expect(2);
 
-		var ip = "31.17.105.227";
+		var ip = "31.17.106.227";
 		var expected = "Neumünster";
 		var actual = geoip.lookup(ip);
 
@@ -36,7 +36,7 @@ module.exports = {
 
 		var actual = geoip.lookup("23.240.63.68");
 
-		test.equal(actual.city, "Van Nuys");
+		test.equal(actual.city, "Santa Ana");
 		test.equal(actual.metro, 803);
 
 		test.done();
