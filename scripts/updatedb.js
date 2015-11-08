@@ -8,9 +8,8 @@ if(!process.env.npm_package_config_update){
 
 var user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36';
 
-var cp = require('child_process');
 var fs = require('fs');
-var http = require('http');
+var https = require('https');
 var path = require('path');
 var url = require('url');
 var zlib = require('zlib');
@@ -29,33 +28,38 @@ var utils = require('../lib/utils');
 var dataPath = path.join(__dirname, '..', 'data');
 var tmpPath = path.join(__dirname, '..', 'tmp');
 
-var databases = [{
-	type: 'country',
-	url: 'http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip',
-	src: 'GeoIPCountryWhois.csv',
-	dest: 'geoip-country.dat'
-},{
-	type: 'country',
-	url: 'http://geolite.maxmind.com/download/geoip/database/GeoIPv6.csv.gz',
-	src: 'GeoIPv6.csv',
-	dest: 'geoip-country6.dat'
-},{
-	type: 'city-extended',
-	url: 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip',
-	src: [
-		'GeoLiteCity/GeoLiteCity-Blocks.csv',
-		'GeoLiteCity/GeoLiteCity-Location.csv'
-	],
-	dest: [
-		'geoip-city.dat',
-		'geoip-city-names.dat'
-	]
-},{
-	type: 'city',
-	url: 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.csv.gz',
-	src: 'GeoLiteCityv6.csv',
-	dest: 'geoip-city6.dat'
-}];
+var databases = [
+	{
+		type: 'country',
+		url: 'https://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip',
+		src: 'GeoIPCountryWhois.csv',
+		dest: 'geoip-country.dat'
+	},
+	{
+		type: 'country',
+		url: 'https://geolite.maxmind.com/download/geoip/database/GeoIPv6.csv.gz',
+		src: 'GeoIPv6.csv',
+		dest: 'geoip-country6.dat'
+	},
+	{
+		type: 'city-extended',
+		url: 'https://geolite.maxmind.com/download/geoip/database/GeoLiteCity_CSV/GeoLiteCity-latest.zip',
+		src: [
+			'GeoLiteCity-Blocks.csv',
+			'GeoLiteCity-Location.csv'
+		],
+		dest: [
+			'geoip-city.dat',
+			'geoip-city-names.dat'
+		]
+	},
+	{
+		type: 'city',
+		url: 'https://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.csv.gz',
+		src: 'GeoLiteCityv6.csv',
+		dest: 'geoip-city6.dat'
+	}
+];
 
 function mkdir(name) {
 	var dir = path.dirname(name);
@@ -86,7 +90,24 @@ function CSVtoArray(text) {
     return a;
 }
 
-function fetch(downloadUrl, cb) {
+function fetch(database, cb) {
+
+	var downloadUrl = database.url;
+	var fileName = downloadUrl.split('/').pop();
+	var gzip = path.extname(fileName) === '.gz';
+
+	if (gzip) {
+		fileName = fileName.replace('.gz', '');
+	}
+
+	var tmpFile = path.join(tmpPath, fileName);
+
+	if (fs.existsSync(tmpFile)) {
+		return cb(null, tmpFile, fileName, database);
+	}
+
+	console.log('Fetching ', downloadUrl);
+
 	function getOptions() {
 		if (process.env.http_proxy) {
 			var options = url.parse(process.env.http_proxy);
@@ -111,7 +132,7 @@ function fetch(downloadUrl, cb) {
 		var status = response.statusCode;
 
 		if (status !== 200) {
-			console.log('ERROR'.red + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
+			console.log('ERROR'.red + ': HTTP Request Failed [%d %s]', status, https.STATUS_CODES[status]);
 			client.abort();
 			process.exit();
 		}
@@ -127,56 +148,36 @@ function fetch(downloadUrl, cb) {
 
 		tmpFilePipe.on('close', function() {
 			console.log(' DONE'.green);
-			cb(tmpFile, fileName);
+			cb(null, tmpFile, fileName, database);
 		});
 	}
 
-	var fileName = downloadUrl.split('/').pop();
-	var gzip = (fileName.indexOf('.gz') !== -1);
-
-	if (gzip) {
-		fileName = fileName.replace('.gz', '');
-	}
-
-	var tmpFile = path.join(tmpPath, fileName);
-
 	mkdir(tmpFile);
 
-	var client = http.get(getOptions(), onResponse);
+	var client = https.get(getOptions(), onResponse);
 
 	process.stdout.write('Retrieving ' + fileName + ' ...');
 }
 
-function extract(tmpFile, tmpFileName, cb) {
-	if (tmpFileName.indexOf('.zip') === -1) {
-		cb();
+function extract(tmpFile, tmpFileName, database, cb) {
+	if (path.extname(tmpFileName) !== '.zip') {
+		cb(null, database);
 	} else {
 		process.stdout.write('Extracting ' + tmpFileName + ' ...');
-
-		var unzipStream = unzip.Extract({
-			path: path.dirname(tmpFile)
-		});
-
-		var pipeSteam = fs.createReadStream(tmpFile).pipe(unzipStream);
-
-		pipeSteam.on('end', function() {
-			console.log(' DONE'.green);
-
-			if (tmpFileName.indexOf('GeoLiteCity') !== -1) {
-				var oldPath = path.join(tmpPath, path.basename(tmpFileName, '.zip'));
-				if(!fs.existsSync(oldPath)) {
-					if(/-latest$/.test(oldPath)) {
-						var prefix = oldPath.replace(/-latest$/, '');
-						oldPath = glob.sync(prefix + '_*')[0];
-					}
+		fs.createReadStream(tmpFile)
+			.pipe(unzip.Parse())
+			.on('entry', function(entry) {
+				var fileName = path.basename(entry.path);
+				var type = entry.type; // 'Directory' or 'File'
+				if (type.toLowerCase() === 'file' && path.extname(fileName) === '.csv') {
+					entry.pipe(fs.createWriteStream(path.join(tmpPath, fileName)));
+				} else {
+					entry.autodrain();
 				}
-
-				var newPath = path.join(tmpPath, 'GeoLiteCity');
-				fs.renameSync(oldPath, newPath);
-			}
-
-			cb();
-		});
+			})
+			.on('finish', function() {
+				cb(null, database);
+			});
 	}
 }
 
@@ -185,7 +186,7 @@ function processCountryData(src, dest, cb) {
 	function processLine(line) {
 		var fields = CSVtoArray(line);
 
-		if (fields.length < 6) {
+		if (!fields || fields.length < 6) {
 			console.log("weird line: %s::", line);
 			return;
 		}
@@ -409,7 +410,11 @@ function processCityDataNames(src, dest, cb) {
 		.on('pipe', cb);
 }
 
-function processData(type, src, dest, cb) {
+function processData(database, cb) {
+	var type = database.type;
+	var src = database.src;
+	var dest = database.dest;
+
 	if (type === 'country') {
 		processCountryData(src, dest, cb);
 	} else if (type === 'city-extended') {
@@ -430,24 +435,18 @@ function processData(type, src, dest, cb) {
 rimraf(tmpPath);
 mkdir(tmpPath);
 
-async.forEachSeries(databases, function(database, nextDatabase) {
-	fetch(database.url, function(tmpFile, tmpFileName) {
-		extract(tmpFile, tmpFileName, function() {
-			processData(database.type, database.src, database.dest, function() {
-				console.log();
-				nextDatabase();
-			});
-		});
-	});
-}, function(err) {
-	console.log();
+async.eachSeries(databases, function(database, nextDatabase) {
 
+	async.seq(fetch, extract, processData)(database, nextDatabase);
+
+}, function(err) {
 	if (err) {
 		console.log('Failed to Update Databases from MaxMind.'.red);
-		process.exit();
+		process.exit(1);
 	} else {
 		console.log('Successfully Updated Databases from MaxMind.'.green);
 		if (process.argv[2]=='debug') console.log('Notice: temporary files are not deleted for debug purposes.'.bold.yellow);
 		else rimraf(tmpPath);
+		process.exit(0);
 	}
 });
