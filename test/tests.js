@@ -40,5 +40,16 @@ module.exports = {
 		test.equal(actual.metro, 803);
 
 		test.done();
+	},
+
+	testIPv4MappedIPv6: function (test) {
+		test.expect(2);
+
+		var actual = geoip.lookup("::ffff:173.185.182.82");
+
+		test.equal(actual.city, "Glen Rose");
+		test.equal(actual.metro, 623);
+
+		test.done();
 	}
 };
