@@ -28,11 +28,19 @@ var utils = require('../lib/utils');
 var dataPath = path.join(__dirname, '..', 'data');
 var tmpPath = path.join(__dirname, '..', 'tmp');
 
+var countryUrl = 'https://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip';
+var countrySrc = 'GeoIPCountryWhois.csv';
+
+if(process.env.LICENSE_KEY){
+	countryUrl = 'https://download.maxmind.com/app/geoip_download?edition_id=108&suffix=zip&license_key='+process.env.LICENSE_KEY+'#/GeoIP.zip';
+	countrySrc = 'GeoIP-108.csv';
+}
+
 var databases = [
 	{
 		type: 'country',
-		url: 'https://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip',
-		src: 'GeoIPCountryWhois.csv',
+		url: countryUrl,
+		src: countrySrc,
 		dest: 'geoip-country.dat'
 	},
 	{
