@@ -151,6 +151,10 @@ Also note that on occassion, the library may take up to 5 seconds to load into m
 how busy your disk is at that time.  It can take as little as 200ms on a lightly loaded disk.  This is a one time
 cost though, and you make it up at run time with very fast lookups.
 
+```shell
+LICENSE_KEY=xxxxxxx npm run-script updatedb
+```
+
 References
 ----------
   - <a href="http://www.maxmind.com/app/iso3166">Documentation from MaxMind</a>
