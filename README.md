@@ -139,6 +139,14 @@ rate limits that amount of downloads on their servers.
 npm run-script updatedb
 ```
 
+You can also run it by doing:
+
+```bash
+node ./node_modules/geoip-lite/scripts/updatedb.js
+```
+
+Or, if you really want, run the update once by `require('geoip-lite/scripts/updatedb.js')`.
+
 Caveats
 -------
 
