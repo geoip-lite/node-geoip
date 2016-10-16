@@ -15,18 +15,18 @@
 		"updatedb-debug": "node scripts/updatedb.js debug"
 	},
 	"dependencies": {
-		"async": "~1.5.2",
-		"colors": "1.1.2",
-		"glob": "~7.0.3",
-		"iconv-lite": "~0.4.13",
-		"lazy": "~1.0.11",
-		"rimraf": "~2.5.2",
-		"unzip": "~0.1.11"
+		"async": "^2.1.1",
+		"colors": "^1.1.2",
+		"glob": "^7.1.1",
+		"iconv-lite": "^0.4.13",
+		"lazy": "^1.0.11",
+		"rimraf": "^2.5.2",
+		"unzip": "^0.1.11"
 	},
 	"config": {
 		"update": true
 	},
 	"devDependencies": {
-		"nodeunit": "~0.9.1"
+		"nodeunit": "^0.10.2"
 	}
 }
