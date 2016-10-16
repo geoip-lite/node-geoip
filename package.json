@@ -28,5 +28,6 @@
 	},
 	"devDependencies": {
 		"nodeunit": "^0.10.2"
-	}
+	},
+	"license": "Apache-2.0"
 }
