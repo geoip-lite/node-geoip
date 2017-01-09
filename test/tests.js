@@ -16,18 +16,18 @@ module.exports = {
 		test.ok(actual, 'should return data about IPv6.');
 
 		test.done();
-	}, 
+	},
 
 	testUTF8: function(test) {
 		test.expect(2);
 
-		var ip = "31.17.106.227";
-		var expected = "Neumünster";
+		var ip = "95.23.1.184";
+		var expected = "Logroño";
 		var actual = geoip.lookup(ip);
 
 		test.ok(actual, "Should return a non-null value for " + ip);
 		test.equal(actual.city, expected, "UTF8 city name does not match");
-		
+
 		test.done();
 	},
 
@@ -47,7 +47,7 @@ module.exports = {
 
 		var actual = geoip.lookup("::ffff:173.185.182.82");
 
-		test.equal(actual.city, "Glen Rose");
+		test.equal(actual.city, "Granbury");
 		test.equal(actual.metro, 623);
 
 		test.done();
