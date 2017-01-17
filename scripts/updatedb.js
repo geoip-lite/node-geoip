@@ -6,6 +6,7 @@ var user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML,
 
 var fs = require('fs');
 var https = require('https');
+var HttpsProxyAgent = require('https-proxy-agent');
 var path = require('path');
 var url = require('url');
 var zlib = require('zlib');
@@ -105,23 +106,17 @@ function fetch(database, cb) {
 	console.log('Fetching ', downloadUrl);
 
 	function getOptions() {
-		if (process.env.http_proxy) {
-			var options = url.parse(process.env.http_proxy);
+		var options = url.parse(downloadUrl);
+		options.headers = {
+			'Host': url.parse(downloadUrl).host,
+			'User-Agent': user_agent
+		};
 
-			options.path = downloadUrl;
-			options.headers = {
-				Host: url.parse(downloadUrl).host
-			};
-
-			return options;
-		} else {
-			var options = url.parse(downloadUrl);
-			options.headers = {
-				'Host': url.parse(downloadUrl).host,
-				'User-Agent': user_agent
-			};
-			return options;
+		if (process.env.https_proxy) {
+			options.agent = new HttpsProxyAgent(process.env.https_proxy);
 		}
+
+		return options;
 	}
 
 	function onResponse(response) {
