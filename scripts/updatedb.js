@@ -6,7 +6,6 @@ var user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML,
 
 var fs = require('fs');
 var https = require('https');
-var HttpsProxyAgent = require('https-proxy-agent');
 var path = require('path');
 var url = require('url');
 var zlib = require('zlib');
@@ -108,12 +107,18 @@ function fetch(database, cb) {
 	function getOptions() {
 		var options = url.parse(downloadUrl);
 		options.headers = {
-			'Host': url.parse(downloadUrl).host,
 			'User-Agent': user_agent
 		};
 
-		if (process.env.https_proxy) {
-			options.agent = new HttpsProxyAgent(process.env.https_proxy);
+		if (process.env.http_proxy || process.env.https_proxy) {
+			try {
+				var HttpsProxyAgent = require('https-proxy-agent');
+				options.agent = new HttpsProxyAgent(process.env.http_proxy || process.env.https_proxy);
+			}
+			catch (e) {
+				console.error("Install https-proxy-agent to use an HTTP/HTTPS proxy");
+				process.exit(-1)
+			}
 		}
 
 		return options;
