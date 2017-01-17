@@ -105,23 +105,23 @@ function fetch(database, cb) {
 	console.log('Fetching ', downloadUrl);
 
 	function getOptions() {
-		if (process.env.http_proxy) {
-			var options = url.parse(process.env.http_proxy);
+		var options = url.parse(downloadUrl);
+		options.headers = {
+			'User-Agent': user_agent
+		};
 
-			options.path = downloadUrl;
-			options.headers = {
-				Host: url.parse(downloadUrl).host
-			};
-
-			return options;
-		} else {
-			var options = url.parse(downloadUrl);
-			options.headers = {
-				'Host': url.parse(downloadUrl).host,
-				'User-Agent': user_agent
-			};
-			return options;
+		if (process.env.http_proxy || process.env.https_proxy) {
+			try {
+				var HttpsProxyAgent = require('https-proxy-agent');
+				options.agent = new HttpsProxyAgent(process.env.http_proxy || process.env.https_proxy);
+			}
+			catch (e) {
+				console.error("Install https-proxy-agent to use an HTTP/HTTPS proxy");
+				process.exit(-1)
+			}
 		}
+
+		return options;
 	}
 
 	function onResponse(response) {
