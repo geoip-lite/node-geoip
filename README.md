@@ -16,7 +16,7 @@ an internal binary format (note that this is different from the binary data form
 binary file to lookup IP addresses and return the country, region and city that it maps to.
 
 Both IPv4 and IPv6 addresses are supported, however since the GeoLite IPv6 database does not currently contain any city or region
-information, city and region lookups are only supported for IPv4.
+information, city, region and postal code lookups are only supported for IPv4.
 
 philosophy
 ----------
@@ -45,11 +45,13 @@ var ip = "207.97.227.239";
 var geo = geoip.lookup(ip);
 
 console.log(geo);
-{ range: [ 3479299040, 3479299071 ],
+{ range: [ 3479297920, 3479301339 ],
   country: 'US',
-  region: 'CA',
-  city: 'San Francisco',
-  ll: [37.7484, -122.4156] }
+  region: 'TX',
+  city: 'San Antonio',
+  ll: [ 29.4889, -98.3987 ],
+  metro: 641,
+  zip: 78218 }
 ```
 
 installation
@@ -95,7 +97,9 @@ If the IP address was found, the `lookup` method returns an object with the foll
                                   // ISO-3166-2 subcountry code for other countries, this is the
                                   // FIPS 10-4 subcountry code
    city: "City Name",             // This is the full city name
-   ll: [<latitude>, <longitude>]  // The latitude and longitude of the city
+   ll: [<latitude>, <longitude>], // The latitude and longitude of the city
+   metro: <metro code>,           // Metro code
+   zip: <postal code>             // Postal code (IPv4 only)
 }
 ```
 

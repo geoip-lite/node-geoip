@@ -369,6 +369,7 @@ function processCityDataNames(src, dest, cb) {
 		var cc = fields[1];
 		var rg = fields[2];
 		var city = fields[3];
+		var zip = parseInt(fields[4]);
 		var lat = Math.round(parseFloat(fields[5]) * 10000);
 		var lon = Math.round(parseFloat(fields[6]) * 10000);
 		var metro = parseInt(fields[7]);
@@ -384,7 +385,11 @@ function processCityDataNames(src, dest, cb) {
 			b.writeInt32BE(metro, 12);
 		}
 
-		b.write(city, 16);
+		if(zip){
+			b.writeInt32BE(zip, 16);
+		}
+
+		b.write(city, 20);
 
 		fs.writeSync(datFile, b, 0, b.length, null);
 	}
