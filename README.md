@@ -60,13 +60,9 @@ installation
 
     $ npm install geoip-lite
 
-### 2. get the datafiles
+### 2. update the datafiles (optional)
 
-Then download the city data files from https://github.com/bluesmoon/node-geoip/tree/master/data
-You need to get `geoip-city.dat` and `geoip-city-names.dat` and put them into the `data/` directory
-of this package.
-
-You could also run `npm run-script updatedb` to do this automatically.
+Run `npm run-script updatedb` to update the data files.
 
 **NOTE** that this requires a lot of RAM.  It is known to fail on on a Digital Ocean or AWS micro instance.
 There are no plans to change this.  `geoip-lite` stores all data in RAM in order to be fast.
