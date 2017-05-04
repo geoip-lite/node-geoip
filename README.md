@@ -62,7 +62,7 @@ installation
 
 ### 2. update the datafiles (optional)
 
-You could run `npm run-script updatedb` to do this automatically.
+Run `npm run-script updatedb` to update the data files.
 
 **NOTE** that this requires a lot of RAM.  It is known to fail on on a Digital Ocean or AWS micro instance.
 There are no plans to change this.  `geoip-lite` stores all data in RAM in order to be fast.
