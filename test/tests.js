@@ -42,6 +42,16 @@ module.exports = {
 		test.done();
 	},
 
+	testContinent: function(test) {
+		test.expect(1);
+
+		var actual = geoip.lookup("104.7.14.245");
+
+		test.equal(actual.continent, "NA");
+
+		test.done();
+	},
+
 	testIPv4MappedIPv6: function (test) {
 		test.expect(2);
 

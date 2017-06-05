@@ -17,6 +17,7 @@
 	"dependencies": {
 		"async": "^2.1.1",
 		"colors": "^1.1.2",
+		"countries-list": "^1.4.1",
 		"glob": "^7.1.1",
 		"iconv-lite": "^0.4.13",
 		"lazy": "^1.0.11",
