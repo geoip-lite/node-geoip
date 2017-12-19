@@ -55,7 +55,7 @@ module.exports = {
 
 	testLeadingZeroZipResult: function (test) {
 		test.expect(3);
-		// Boston, MA are usually zip codes starting with a 0
+		// Boston, MA (US) are zip codes starting with a 0
 		var actual = geoip.lookup('76.19.11.68');
 		var other = geoip.lookup('66.249.79.92');
 
