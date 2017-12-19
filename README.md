@@ -51,7 +51,7 @@ console.log(geo);
   city: 'San Antonio',
   ll: [ 29.4889, -98.3987 ],
   metro: 641,
-  zip: 78218 }
+  zip: '78218' }
 ```
 
 installation
