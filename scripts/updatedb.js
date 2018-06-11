@@ -26,6 +26,7 @@ var Address4 = require('ip-address').Address4;
 var dataPath = path.join(__dirname, '..', 'data');
 var tmpPath = path.join(__dirname, '..', 'tmp');
 var countryLookup = {};
+var cityLookup = {};
 var databases = [
 	{
 		type: 'country',
@@ -316,6 +317,7 @@ function processCityData(src, dest, cb) {
             sip = utils.aton6(rngip.startAddress().correctForm());
             eip = utils.aton6(rngip.endAddress().correctForm());
             locId = parseInt(fields[1], 10);
+            locId = cityLookup[locId];
 
 			b = new Buffer(bsz);
 			b.fill(0);
@@ -338,7 +340,7 @@ function processCityData(src, dest, cb) {
             sip = parseInt(rngip.startAddress().bigInteger(),10);
             eip = parseInt(rngip.endAddress().bigInteger(),10);
             locId = parseInt(fields[1], 10);
-
+            locId = cityLookup[locId];
 			b = new Buffer(bsz);
 			b.fill(0);
 			b.writeUInt32BE(sip>>>0, 0);
@@ -374,7 +376,7 @@ function processCityData(src, dest, cb) {
 
 function processCityDataNames(src, dest, cb) {
 	var locId = null;
-
+    var linesCount = 0;
 	function processLine(line, i, a) {
 		if (line.match(/^Copyright/) || !line.match(/\d/)) {
 			return;
@@ -388,16 +390,10 @@ function processCityDataNames(src, dest, cb) {
 			console.log("weird line: %s::", line);
 			return;
 		}
-		if (locId === null)
-			locId = parseInt(fields[0]);
-		else {
-			if (parseInt(fields[0]) - 1 > locId) {
-				b = new Buffer(sz);
-				b.fill(0);
-				fs.writeSync(datFile, b, 0, b.length, null);
-			}
-			locId = parseInt(fields[0]);
-		}
+		
+        locId = parseInt(fields[0]);
+
+        cityLookup[locId] = linesCount;
 		var cc = fields[4];
 		var rg = fields[2];
 		var city = fields[10];
@@ -419,6 +415,7 @@ function processCityDataNames(src, dest, cb) {
 		b.write(city, 8);
 
 		fs.writeSync(datFile, b, 0, b.length, null);
+        linesCount++;
 	}
 
 	var dataFile = path.join(dataPath, dest);
