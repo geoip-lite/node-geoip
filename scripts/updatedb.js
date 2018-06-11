@@ -383,7 +383,7 @@ function processCityDataNames(src, dest, cb) {
 		}
 
 		var b;
-		var sz = 64;
+		var sz = 96;
 		var fields = CSVtoArray(line);
         if (!fields) {
             //lot's of cities contain ` or ' in the name and can't be parsed correctly with current method
@@ -401,18 +401,29 @@ function processCityDataNames(src, dest, cb) {
         //other possible fields to include
         var tz = fields[12];
         var eu = fields[13];
-        var lc = fields[1];
+
+        //coming back later
+        /*
+        var lat = Math.round(parseFloat(fields[7]) * 10000);
+        var lon = Math.round(parseFloat(fields[8]) * 10000);
+        */
+
 
 		b = new Buffer(sz);
 		b.fill(0);
-		b.write(cc, 0);
-		b.write(rg, 2);
+		b.write(cc, 0);//country code
+		b.write(rg, 2);//region
 
 		if(metro){
 			b.writeInt32BE(metro, 4);
 		}
-
-		b.write(city, 8);
+        /* remove comment when lat and long is back
+        b.writeInt32BE(lat,8);
+        b.writeInt32BE(lon,12);
+        */
+        b.write(eu,16);//is in eu
+        b.write(tz,17);//timezone
+		b.write(city, 41);//cityname
 
 		fs.writeSync(datFile, b, 0, b.length, null);
         linesCount++;
