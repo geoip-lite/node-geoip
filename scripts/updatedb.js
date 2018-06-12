@@ -439,7 +439,7 @@ function processCityDataNames(src, dest, cb) {
 	lazy(fs.createReadStream(tmpDataFile))
 		.lines
 		.map(function(byteArray) {
-			return iconv.decode(byteArray, 'latin1');
+			return iconv.decode(byteArray, 'utf-8');
 		})
 		.skip(1)
 		.map(processLine)
