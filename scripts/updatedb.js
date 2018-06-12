@@ -67,25 +67,53 @@ function mkdir(name) {
 
 // Ref: http://stackoverflow.com/questions/8493195/how-can-i-parse-a-csv-string-with-javascript
 // Return array of string values, or NULL if CSV string not well formed.
+// Return array of string values, or NULL if CSV string not well formed.
+
+function try_fixing_line(line)
+{
+    var pos1=0;
+    var pos2 = -1;
+    line = line.replace(/'/g,"\\'");
+    
+    while(pos1<line.length && pos2<line.length)
+    {
+        pos1 = pos2;
+        pos2 = line.indexOf(',',pos1+1);
+        if(pos2<0) pos2 = line.length;
+       if(line.indexOf("'",(pos1|| 0))>-1 && line.indexOf("'",pos1)<pos2 && line[pos1+1]!='"' && line[pos2-1]!='"')
+        {
+            line = line.substr(0,pos1+1)+'"'+line.substr(pos1+1,pos2-pos1-1)+'"'+line.substr(pos2,line.length-pos2);
+            pos2=line.indexOf(',',pos2+1);
+            if(pos2<0) pos2 = line.length;
+        }
+    }
+    return line;
+}
+
 function CSVtoArray(text) {
     var re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
     var re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
     // Return NULL if input string is not well formed CSV string.
-    if (!re_valid.test(text)) return null;
-    var a = [];                     // Initialize array to receive values.
+    if (!re_valid.test(text)){
+        text  = try_fixing_line(text);
+        if(!re_valid.test(text))
+            return null;
+    }
+    var a = []; // Initialize array to receive values.
     text.replace(re_value, // "Walk" the string using replace with callback.
         function(m0, m1, m2, m3) {
             // Remove backslash from \' in single quoted values.
             if      (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
             // Remove backslash from \" in double quoted values.
-            else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"'));
+            else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"').replace(/\\'/g, "'"));
             else if (m3 !== undefined) a.push(m3);
             return ''; // Return empty string.
         });
     // Handle special case of empty last value.
     if (/,\s*$/.test(text)) a.push('');
     return a;
-}
+};
+
 
 function fetch(database, cb) {
 
@@ -407,8 +435,6 @@ function processCityDataNames(src, dest, cb) {
         var lat = Math.round(parseFloat(fields[7]) * 10000);
         var lon = Math.round(parseFloat(fields[8]) * 10000);
         */
-
-
 		b = new Buffer(sz);
 		b.fill(0);
 		b.write(cc, 0);//country code
@@ -465,6 +491,7 @@ function processData(database, cb) {
 	} else if (type === 'city') {
         processCityDataNames(src[0], dest[0], function(){
             processCityData(src[1], dest[1], function() {
+                console.log("city data processed");
                 processCityData(src[2], dest[2], function() {
                     console.log(' DONE'.green);
                     cb();
