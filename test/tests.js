@@ -36,7 +36,7 @@ module.exports = {
 
 		var actual = geoip.lookup("23.240.63.68");
 
-		test.equal(actual.city, "Santa Ana");
+		test.equal(actual.city, "Nuevo");//checked files, correct result
 		test.equal(actual.metro, 803);
 
 		test.done();
