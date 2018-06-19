@@ -21,7 +21,7 @@
 		"iconv-lite": "^0.4.13",
 		"lazy": "^1.0.11",
 		"rimraf": "^2.5.2",
-		"unzip": "^0.1.11"
+		"yauzl": "^2.9.2"
 	},
 	"config": {
 		"update": true
