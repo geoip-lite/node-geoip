@@ -161,23 +161,28 @@ function extract(tmpFile, tmpFileName, database, cb) {
 	} else {
 		process.stdout.write('Extracting ' + tmpFileName + ' ...');
 		yauzl.open(tmpFile, {autoClose: true, lazyEntries: true}, function(err, zipfile) {
-			if (err) throw err;
+			if (err) {
+				throw err;
+			}
 			zipfile.readEntry();
 			zipfile.on("entry", function(entry) {
 				if (/\/$/.test(entry.fileName)) {
 					// Directory file names end with '/'.
-					// Note that entires for directories themselves are optional.
+					// Note that entries for directories themselves are optional.
 					// An entry's fileName implicitly requires its parent directories to exist.
 					zipfile.readEntry();
 				} else {
 					// file entry
 					zipfile.openReadStream(entry, function(err, readStream) {
-						if (err) throw err;
+						if (err) {
+							throw err;
+						}
 						readStream.on("end", function() {
 							zipfile.readEntry();
 						});
 						var filePath = entry.fileName.split("/");
-						var fileName = filePath[filePath.length - 1];
+						// filePath will always have length >= 1, as split() always returns an array of at least one string
+						var fileName = filePath[filePath.length - 1]; 
 						readStream.pipe(fs.createWriteStream(path.join(tmpPath, fileName)));
 					});
 				}
