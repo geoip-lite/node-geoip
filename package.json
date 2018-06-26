@@ -19,15 +19,17 @@
 		"colors": "^1.1.2",
 		"glob": "^7.1.1",
 		"iconv-lite": "^0.4.13",
+		"ip-address": "^5.8.9",
 		"lazy": "^1.0.11",
 		"rimraf": "^2.5.2",
+		"save": "^2.3.2",
 		"yauzl": "^2.9.2"
 	},
 	"config": {
 		"update": true
 	},
 	"devDependencies": {
-		"nodeunit": "^0.10.2"
+		"nodeunit": "^0.11.2"
 	},
 	"license": "Apache-2.0"
 }
