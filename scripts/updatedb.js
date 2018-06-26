@@ -18,7 +18,7 @@ var glob = require('glob');
 var iconv = require('iconv-lite');
 var lazy = require('lazy');
 var rimraf = require('rimraf').sync;
-var unzip = require('unzip-stream');
+var yauzl = require('yauzl');
 var utils = require('../lib/utils');
 var Address6 = require('ip-address').Address6;
 var Address4 = require('ip-address').Address4;
@@ -186,20 +186,37 @@ function extract(tmpFile, tmpFileName, database, cb) {
 		cb(null, database);
 	} else {
 		process.stdout.write('Extracting ' + tmpFileName + ' ...');
-		fs.createReadStream(tmpFile)
-			.pipe(unzip.Parse())
-			.on('entry', function(entry) {
-				var fileName = path.basename(entry.path);
-				var type = entry.type; // 'Directory' or 'File'
-				if (type.toLowerCase() === 'file' && path.extname(fileName) === '.csv') {
-					entry.pipe(fs.createWriteStream(path.join(tmpPath, fileName)));
+		yauzl.open(tmpFile, {autoClose: true, lazyEntries: true}, function(err, zipfile) {
+			if (err) {
+				throw err;
+			}
+			zipfile.readEntry();
+			zipfile.on("entry", function(entry) {
+				if (/\/$/.test(entry.fileName)) {
+					// Directory file names end with '/'.
+					// Note that entries for directories themselves are optional.
+					// An entry's fileName implicitly requires its parent directories to exist.
+					zipfile.readEntry();
 				} else {
-					entry.autodrain();
+					// file entry
+					zipfile.openReadStream(entry, function(err, readStream) {
+						if (err) {
+							throw err;
+						}
+						readStream.on("end", function() {
+							zipfile.readEntry();
+						});
+						var filePath = entry.fileName.split("/");
+						// filePath will always have length >= 1, as split() always returns an array of at least one string
+						var fileName = filePath[filePath.length - 1]; 
+						readStream.pipe(fs.createWriteStream(path.join(tmpPath, fileName)));
+					});
 				}
-			})
-			.on('finish', function() {
+			});
+			zipfile.once("end", function() {
 				cb(null, database);
 			});
+		});
 	}
 }
 function processLookupCountry(src, cb){

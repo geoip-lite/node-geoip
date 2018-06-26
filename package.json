@@ -1,6 +1,6 @@
 {
 	"name"        :  "geoip-lite",
-	"version"     :  "1.2.1",
+	"version"     :  "1.2.2",
 	"description" :  "A light weight native JavaScript implementation of GeoIP API from MaxMind",
 	"keywords"    :  ["geo", "geoip", "ip", "ipv4", "ipv6", "geolookup", "maxmind", "geolite"],
 	"homepage"    :  "https://github.com/bluesmoon/node-geoip",
@@ -23,7 +23,7 @@
 		"lazy": "^1.0.11",
 		"rimraf": "^2.5.2",
 		"save": "^2.3.2",
-		"unzip-stream": "^0.3.0"
+		"yauzl": "^2.9.2"
 	},
 	"config": {
 		"update": true
