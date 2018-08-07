@@ -374,13 +374,13 @@ function processCityData(src, dest, cb) {
 				offset += 4;
 			}
 			b.writeUInt32BE(locId>>>0, 32);
-            
-            var lat = Math.round(parseFloat(fields[7]) * 10000);
-            var lon = Math.round(parseFloat(fields[8]) * 10000);
-            var area = parseInt(fields[9], 10);
-            b.writeInt32BE(lat,36);
-            b.writeInt32BE(lon,40);
-            b.writeInt32BE(area,44);
+			
+			var lat = Math.round(parseFloat(fields[7]) * 10000);
+			var lon = Math.round(parseFloat(fields[8]) * 10000);
+			var area = parseInt(fields[9], 10);
+			b.writeInt32BE(lat,36);
+			b.writeInt32BE(lon,40);
+			b.writeInt32BE(area,44);
 		} else {
 			// IPv4
 			bsz = 24;
@@ -396,12 +396,12 @@ function processCityData(src, dest, cb) {
 			b.writeUInt32BE(eip>>>0, 4);
 			b.writeUInt32BE(locId>>>0, 8);
 
-            var lat = Math.round(parseFloat(fields[7]) * 10000);
-            var lon = Math.round(parseFloat(fields[8]) * 10000);
-            var area = parseInt(fields[9], 10);
-            b.writeInt32BE(lat,12);
-            b.writeInt32BE(lon,16);
-            b.writeInt32BE(area,20);
+			var lat = Math.round(parseFloat(fields[7]) * 10000);
+			var lon = Math.round(parseFloat(fields[8]) * 10000);
+			var area = parseInt(fields[9], 10);
+			b.writeInt32BE(lat,12);
+			b.writeInt32BE(lon,16);
+			b.writeInt32BE(area,20);
 		}
 
 		fs.writeSync(datFile, b, 0, b.length, null);
