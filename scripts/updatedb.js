@@ -354,7 +354,7 @@ function processCityData(src, dest, cb) {
 		if (fields[0].match(/:/)) {
 			// IPv6
 			var offset = 0;
-			bsz = 36;
+			bsz = 48;
 			rngip = new Address6(fields[0]);
 			sip = utils.aton6(rngip.startAddress().correctForm());
 			eip = utils.aton6(rngip.endAddress().correctForm());
@@ -374,9 +374,16 @@ function processCityData(src, dest, cb) {
 				offset += 4;
 			}
 			b.writeUInt32BE(locId>>>0, 32);
+			
+			var lat = Math.round(parseFloat(fields[7]) * 10000);
+			var lon = Math.round(parseFloat(fields[8]) * 10000);
+			var area = parseInt(fields[9], 10);
+			b.writeInt32BE(lat,36);
+			b.writeInt32BE(lon,40);
+			b.writeInt32BE(area,44);
 		} else {
 			// IPv4
-			bsz = 12;
+			bsz = 24;
 
 			rngip = new Address4(fields[0]);
 			sip = parseInt(rngip.startAddress().bigInteger(),10);
@@ -388,6 +395,13 @@ function processCityData(src, dest, cb) {
 			b.writeUInt32BE(sip>>>0, 0);
 			b.writeUInt32BE(eip>>>0, 4);
 			b.writeUInt32BE(locId>>>0, 8);
+
+			var lat = Math.round(parseFloat(fields[7]) * 10000);
+			var lon = Math.round(parseFloat(fields[8]) * 10000);
+			var area = parseInt(fields[9], 10);
+			b.writeInt32BE(lat,12);
+			b.writeInt32BE(lon,16);
+			b.writeInt32BE(area,20);
 		}
 
 		fs.writeSync(datFile, b, 0, b.length, null);
@@ -425,7 +439,7 @@ function processCityDataNames(src, dest, cb) {
 		}
 
 		var b;
-		var sz = 96;
+		var sz = 88;
 		var fields = CSVtoArray(line);
 		if (!fields) {
 			//lot's of cities contain ` or ' in the name and can't be parsed correctly with current method
@@ -444,11 +458,6 @@ function processCityDataNames(src, dest, cb) {
 		var tz = fields[12];
 		var eu = fields[13];
 
-		//coming back later
-		/*
-		var lat = Math.round(parseFloat(fields[7]) * 10000);
-		var lon = Math.round(parseFloat(fields[8]) * 10000);
-		*/
 		b = new Buffer(sz);
 		b.fill(0);
 		b.write(cc, 0);//country code
@@ -457,13 +466,9 @@ function processCityDataNames(src, dest, cb) {
 		if(metro) {
 			b.writeInt32BE(metro, 4);
 		}
-		/* remove comment when lat and long is back
-		b.writeInt32BE(lat,8);
-		b.writeInt32BE(lon,12);
-		*/
-		b.write(eu,16);//is in eu
-		b.write(tz,17);//timezone
-		b.write(city, 41);//cityname
+		b.write(eu,8);//is in eu
+		b.write(tz,9);//timezone
+		b.write(city, 33);//cityname
 
 		fs.writeSync(datFile, b, 0, b.length, null);
 		linesCount++;
