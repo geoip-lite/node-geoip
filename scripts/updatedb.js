@@ -2,6 +2,7 @@
 
 'use strict';
 
+
 var user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36';
 
 var fs = require('fs');
@@ -13,8 +14,6 @@ var zlib = require('zlib');
 fs.existsSync = fs.existsSync || path.existsSync;
 
 var async = require('async');
-var colors = require('colors');
-var glob = require('glob');
 var iconv = require('iconv-lite');
 var lazy = require('lazy');
 var rimraf = require('rimraf').sync;
@@ -25,23 +24,8 @@ var Address4 = require('ip-address').Address4;
 
 var dataPath = path.join(__dirname, '..', 'data');
 var tmpPath = path.join(__dirname, '..', 'tmp');
-var countryLookup = {};
 var cityLookup = {};
 var databases = [
-	{
-		type: 'country',
-		url: 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country-CSV.zip',
-		src: [
-			'GeoLite2-Country-Locations-en.csv',
-			'GeoLite2-Country-Blocks-IPv4.csv',
-			'GeoLite2-Country-Blocks-IPv6.csv'
-		],
-		dest: [
-			'',
-			'geoip-country.dat',
-			'geoip-country6.dat'
-		]
-	},
 	{
 		type: 'city',
 		url: 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip',
@@ -57,6 +41,8 @@ var databases = [
 		]
 	}
 ];
+
+var filterValues = require('./filterValues');
 
 function mkdir(name) {
 	var dir = path.dirname(name);
@@ -219,114 +205,6 @@ function extract(tmpFile, tmpFileName, database, cb) {
 		});
 	}
 }
-function processLookupCountry(src, cb){
-	var lines=0;
-	function processLine(line) {
-		var fields = CSVtoArray(line);
-		if (!fields || fields.length < 6) {
-			console.log("weird line: %s::", line);
-			return;
-		}
-		countryLookup[fields[0]] = fields[4];
-	}
-	var tmpDataFile = path.join(tmpPath, src);
-
-	process.stdout.write('Processing Lookup Data (may take a moment) ...');
-	var tstart = Date.now();
-
-	lazy(fs.createReadStream(tmpDataFile))
-		.lines
-		.map(function(byteArray) {
-			return iconv.decode(byteArray, 'latin1');
-		})
-		.skip(1)
-		.map(processLine)
-		.on('pipe', function() {
-			console.log(' DONE'.green);
-			cb();
-		});
-}
-
-function processCountryData(src, dest, cb) {
-	var lines=0;
-	function processLine(line) {
-		var fields = CSVtoArray(line);
-
-		if (!fields || fields.length < 6) {
-			console.log("weird line: %s::", line);
-			return;
-		}
-		lines++;
-
-		var sip;
-		var eip;
-		var rngip;
-		var cc = countryLookup[fields[1]];
-		var b;
-		var bsz;
-		var i;
-		if(cc){
-			if (fields[0].match(/:/)) {
-				// IPv6
-				bsz = 34;
-				rngip = new Address6(fields[0]);
-				sip = utils.aton6(rngip.startAddress().correctForm());
-				eip = utils.aton6(rngip.endAddress().correctForm());
-	
-				b = new Buffer(bsz);
-				for (i = 0; i < sip.length; i++) {
-					b.writeUInt32BE(sip[i], i * 4);
-				}
-	
-				for (i = 0; i < eip.length; i++) {
-					b.writeUInt32BE(eip[i], 16 + (i * 4));
-				}
-			} else {
-				// IPv4
-				bsz = 10;
-   
-				rngip = new Address4(fields[0]);
-				sip = parseInt(rngip.startAddress().bigInteger(),10);
-				eip = parseInt(rngip.endAddress().bigInteger(),10);
-	
-				b = new Buffer(bsz);
-				b.fill(0);
-				b.writeUInt32BE(sip, 0);
-				b.writeUInt32BE(eip, 4);
-			}
-	
-			b.write(cc, bsz - 2);
-	
-			fs.writeSync(datFile, b, 0, bsz, null);
-			if(Date.now() - tstart > 5000) {
-				tstart = Date.now();
-				process.stdout.write('\nStill working (' + lines + ') ...');
-			}
-		}
-	}
-
-	var dataFile = path.join(dataPath, dest);
-	var tmpDataFile = path.join(tmpPath, src);
-
-	rimraf(dataFile);
-	mkdir(dataFile);
-
-	process.stdout.write('Processing Data (may take a moment) ...');
-	var tstart = Date.now();
-	var datFile = fs.openSync(dataFile, "w");
-
-	lazy(fs.createReadStream(tmpDataFile))
-		.lines
-		.map(function(byteArray) {
-			return iconv.decode(byteArray, 'latin1');
-		})
-		.skip(1)
-		.map(processLine)
-		.on('pipe', function() {
-			console.log(' DONE'.green);
-			cb();
-		});
-}
 
 function processCityData(src, dest, cb) {
 	var lines = 0;
@@ -340,6 +218,13 @@ function processCityData(src, dest, cb) {
 			console.log("weird line: %s::", line);
 			return;
 		}
+
+		locId = parseInt(fields[1], 10);
+		locId = cityLookup[locId];
+		if(!locId){
+			return;
+		}
+
 		var sip;
 		var eip;
 		var rngip;
@@ -358,8 +243,6 @@ function processCityData(src, dest, cb) {
 			rngip = new Address6(fields[0]);
 			sip = utils.aton6(rngip.startAddress().correctForm());
 			eip = utils.aton6(rngip.endAddress().correctForm());
-			locId = parseInt(fields[1], 10);
-			locId = cityLookup[locId];
 
 			b = new Buffer(bsz);
 			b.fill(0);
@@ -388,8 +271,6 @@ function processCityData(src, dest, cb) {
 			rngip = new Address4(fields[0]);
 			sip = parseInt(rngip.startAddress().bigInteger(),10);
 			eip = parseInt(rngip.endAddress().bigInteger(),10);
-			locId = parseInt(fields[1], 10);
-			locId = cityLookup[locId];
 			b = new Buffer(bsz);
 			b.fill(0);
 			b.writeUInt32BE(sip>>>0, 0);
@@ -449,6 +330,12 @@ function processCityDataNames(src, dest, cb) {
 		
 		locId = parseInt(fields[0]);
 
+		// don't compute further if the state is not included in filterValues.
+		if(!filterValues.states.includes(fields[5])){
+			return;
+		}
+
+
 		cityLookup[locId] = linesCount;
 		var cc = fields[4];
 		var rg = fields[2];
@@ -496,18 +383,7 @@ function processData(database, cb) {
 	var src = database.src;
 	var dest = database.dest;
 
-	if (type === 'country') {
-		if(Array.isArray(src)){
-			processLookupCountry(src[0], function() {
-				processCountryData(src[1], dest[1], function() {
-					processCountryData(src[2], dest[2], cb);
-				});
-			});
-		}
-		else{
-			processCountryData(src, dest, cb);
-		}
-	} else if (type === 'city') {
+	if (type === 'city') {
 		processCityDataNames(src[0], dest[0], function() {
 			processCityData(src[1], dest[1], function() {
 				console.log("city data processed");
