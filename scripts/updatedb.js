@@ -273,7 +273,7 @@ function processCountryData(src, dest, cb) {
 				sip = utils.aton6(rngip.startAddress().correctForm());
 				eip = utils.aton6(rngip.endAddress().correctForm());
 	
-				b = new Buffer(bsz);
+				b = Buffer.alloc(bsz);
 				for (i = 0; i < sip.length; i++) {
 					b.writeUInt32BE(sip[i], i * 4);
 				}
@@ -284,12 +284,12 @@ function processCountryData(src, dest, cb) {
 			} else {
 				// IPv4
 				bsz = 10;
-   
+
 				rngip = new Address4(fields[0]);
 				sip = parseInt(rngip.startAddress().bigInteger(),10);
 				eip = parseInt(rngip.endAddress().bigInteger(),10);
 	
-				b = new Buffer(bsz);
+				b = Buffer.alloc(bsz);
 				b.fill(0);
 				b.writeUInt32BE(sip, 0);
 				b.writeUInt32BE(eip, 4);
@@ -361,7 +361,7 @@ function processCityData(src, dest, cb) {
 			locId = parseInt(fields[1], 10);
 			locId = cityLookup[locId];
 
-			b = new Buffer(bsz);
+			b = Buffer.alloc(bsz);
 			b.fill(0);
 
 			for (i = 0; i < sip.length; i++) {
@@ -390,7 +390,7 @@ function processCityData(src, dest, cb) {
 			eip = parseInt(rngip.endAddress().bigInteger(),10);
 			locId = parseInt(fields[1], 10);
 			locId = cityLookup[locId];
-			b = new Buffer(bsz);
+			b = Buffer.alloc(bsz);
 			b.fill(0);
 			b.writeUInt32BE(sip>>>0, 0);
 			b.writeUInt32BE(eip>>>0, 4);
@@ -458,7 +458,7 @@ function processCityDataNames(src, dest, cb) {
 		var tz = fields[12];
 		var eu = fields[13];
 
-		b = new Buffer(sz);
+		b = Buffer.alloc(sz);
 		b.fill(0);
 		b.write(cc, 0);//country code
 		b.write(rg, 2);//region
