@@ -451,7 +451,7 @@ function processCityDataNames(src, dest, cb) {
 
 		cityLookup[locId] = linesCount;
 		var cc = fields[4];
-		var rg = fields[2];
+		var rg = fields[6];
 		var city = fields[10];
 		var metro = parseInt(fields[11]);
 		//other possible fields to include
