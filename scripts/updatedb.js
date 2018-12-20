@@ -464,11 +464,11 @@ function processCityDataNames(src, dest, cb) {
 		b.write(rg, 2);//region
 
 		if(metro) {
-			b.writeInt32BE(metro, 4);
+			b.writeInt32BE(metro, 5);
 		}
-		b.write(eu,8);//is in eu
-		b.write(tz,9);//timezone
-		b.write(city, 33);//cityname
+		b.write(eu,9);//is in eu
+		b.write(tz,10);//timezone
+		b.write(city, 34);//cityname
 
 		fs.writeSync(datFile, b, 0, b.length, null);
 		linesCount++;

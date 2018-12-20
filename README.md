@@ -45,13 +45,16 @@ var ip = "207.97.227.239";
 var geo = geoip.lookup(ip);
 
 console.log(geo);
-{ range: [ 3479297920, 3479301339 ],
+{ range: [ 3479298048, 3479300095 ],
   country: 'US',
   region: 'TX',
+  eu: '0',
+  timezone: 'America/Chicago',
   city: 'San Antonio',
-  ll: [ 29.4889, -98.3987 ],
+  ll: [ 29.4969, -98.4032 ],
   metro: 641,
-  zip: 78218 }
+  area: 1000 }
+
 ```
 
 installation
@@ -89,13 +92,16 @@ If the IP address was found, the `lookup` method returns an object with the foll
 {
    range: [ <low bound of IP block>, <high bound of IP block> ],
    country: 'XX',                 // 2 letter ISO-3166-1 country code
-   region: 'RR',                  // 2 character region code.  For US states this is the 2 letter
-                                  // ISO-3166-2 subcountry code for other countries, this is the
+   region: 'RR',                  // Up to 3 alphanumeric variable length characters as ISO 3166-2 code
+                                  // For US states this is the 2 letter state
+                                  // For the United Kingdom this could be ENG as a country like “England
                                   // FIPS 10-4 subcountry code
+   eu: '0',                       // 1 if the country is a member state of the European Union, 0 otherwise.
+   timezone: 'Country/Zone',      // Timezone from IANA Time Zone Database
    city: "City Name",             // This is the full city name
    ll: [<latitude>, <longitude>], // The latitude and longitude of the city
    metro: <metro code>,           // Metro code
-   zip: <postal code>             // Postal code (IPv4 only)
+   area: <accuracy_radius>        // The approximate accuracy radius (km), around the latitude and longitude
 }
 ```
 
@@ -126,6 +132,18 @@ geoip.startWatchingDataUpdate();
 ```
 
 This tool can be used with `npm run-script updatedb` to periodically update geo data on a running server.
+
+Additionally, if you schedule upgrades, you can programmatically make geoip reload the data from new database
+
+```javascript
+//Synchronously
+geoip.reloadDataSync();
+
+//Asynchronously
+geoip.reloadData(function(){
+    console.log("Done");
+});
+```
 
 
 Built-in Updater
