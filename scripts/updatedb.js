@@ -72,7 +72,8 @@ function mkdir(name) {
 function try_fixing_line(line) {
 	var pos1 = 0;
 	var pos2 = -1;
-	line = line.replace(/'/g,"\\'");
+	// escape quotes
+	line = line.replace(/""/,'\\"').replace(/'/g,"\\'");
 	
 	while(pos1 < line.length && pos2 < line.length) {
 		pos1 = pos2;
