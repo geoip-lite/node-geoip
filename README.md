@@ -5,6 +5,8 @@ A native NodeJS API for the GeoLite data from MaxMind.
 
 This product includes GeoLite data created by MaxMind, available from http://maxmind.com/
 
+[![Build Status](https://travis-ci.org/bluesmoon/node-geoip.svg?branch=master "node-geoip on Travis")](https://travis-ci.org/bluesmoon/node-geoip)
+
 introduction
 ------------
 
