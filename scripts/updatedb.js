@@ -603,7 +603,8 @@ function processData(database, cb) {
 }
 
 function updateChecksum(database, cb) {
-	if (database.skip) {
+	if (database.skip || !database.checkValue) {
+		//don't need to update checksums cause it was not fetched or did not change
 		return cb();
 	}
 	fs.writeFile(path.join(dataPath, database.type+".checksum"), database.checkValue, 'utf8', function(err){
