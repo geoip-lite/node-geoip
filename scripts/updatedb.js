@@ -469,7 +469,7 @@ function processCityDataNames(src, dest, cb) {
 		}
 		b.write(eu,9);//is in eu
 		b.write(tz,10);//timezone
-		b.write(city, 34);//cityname
+		b.write(city, 42);//cityname
 
 		fs.writeSync(datFile, b, 0, b.length, null);
 		linesCount++;
