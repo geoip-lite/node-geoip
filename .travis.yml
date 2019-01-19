@@ -10,3 +10,4 @@ install:
 script:
 - npm test
 - npm run-script updatedb
+- npm run-script updatedb force
