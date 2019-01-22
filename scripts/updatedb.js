@@ -22,6 +22,7 @@ var utils = require('../lib/utils');
 var Address6 = require('ip-address').Address6;
 var Address4 = require('ip-address').Address4;
 
+var args = process.argv.slice(2);
 var dataPath = path.join(__dirname, '..', 'data');
 var tmpPath = path.join(__dirname, '..', 'tmp');
 var countryLookup = {};
@@ -30,6 +31,7 @@ var databases = [
 	{
 		type: 'country',
 		url: 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country-CSV.zip',
+		checksum: 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.md5',
 		src: [
 			'GeoLite2-Country-Locations-en.csv',
 			'GeoLite2-Country-Blocks-IPv4.csv',
@@ -44,6 +46,7 @@ var databases = [
 	{
 		type: 'city',
 		url: 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip',
+		checksum: 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.md5',
 		src: [
 			'GeoLite2-City-Locations-en.csv',
 			'GeoLite2-City-Blocks-IPv4.csv',
@@ -111,8 +114,92 @@ function CSVtoArray(text) {
 	return a;
 }
 
+function getHTTPOptions(downloadUrl) {
+	var options = url.parse(downloadUrl);
+	options.headers = {
+		'User-Agent': user_agent
+	};
+
+	if (process.env.http_proxy || process.env.https_proxy) {
+		try {
+			var HttpsProxyAgent = require('https-proxy-agent');
+			options.agent = new HttpsProxyAgent(process.env.http_proxy || process.env.https_proxy);
+		}
+		catch (e) {
+			console.error("Install https-proxy-agent to use an HTTP/HTTPS proxy");
+			process.exit(-1);
+		}
+	}
+
+	return options;
+}
+
+function check(database, cb) {
+	if (args.indexOf("force") !== -1) {
+		//we are forcing database upgrade,
+		//so not even using checksums
+		return cb(null, database);
+	}
+    
+	var checksumUrl = database.checksum;
+    
+	if (typeof checksumUrl === "undefined") {
+		//no checksum url to check, skipping
+		return cb(null, database);
+	}
+    
+	//read existing checksum file
+	fs.readFile(path.join(dataPath, database.type+".checksum"), function(err, data) {
+		if (!err && data && data.length) {
+			database.checkValue = data;
+		}
+        
+		console.log('Checking ', checksumUrl);
+        
+		function onResponse(response) {
+			var status = response.statusCode;
+    
+			if (status !== 200) {
+				console.log('ERROR'.red + ': HTTP Request Failed [%d %s]', status, https.STATUS_CODES[status]);
+				client.abort();
+				process.exit();
+			}
+    
+			var str = "";
+			response.on("data", function (chunk) {
+				str += chunk;
+			});
+            
+			response.on("end", function () {
+				if (str && str.length) {
+					if (str == database.checkValue) {
+						console.log(('Database "' + database.type + '" is up to date').green);
+						database.skip = true;
+					}
+					else {
+						console.log(('Database ' + database.type + ' has new data').green);
+						database.checkValue = str;
+					}
+				}
+				else {
+					console.log('ERROR'.red + ': Could not retrieve checksum for', database.type, 'Aborting'.red);
+					console.log('Run with "force" to update without checksum');
+					client.abort();
+					process.exit();
+				}
+				cb(null, database);
+			});
+		}
+        
+		var client = https.get(getHTTPOptions(checksumUrl), onResponse);
+	});
+}
 
 function fetch(database, cb) {
+    
+	if (database.skip) {
+		return cb(null, null, null, database);
+	}
 
 	var downloadUrl = database.url;
 	var fileName = downloadUrl.split('/').pop();
@@ -129,26 +216,6 @@ function fetch(database, cb) {
 	}
 
 	console.log('Fetching ', downloadUrl);
-
-	function getOptions() {
-		var options = url.parse(downloadUrl);
-		options.headers = {
-			'User-Agent': user_agent
-		};
-
-		if (process.env.http_proxy || process.env.https_proxy) {
-			try {
-				var HttpsProxyAgent = require('https-proxy-agent');
-				options.agent = new HttpsProxyAgent(process.env.http_proxy || process.env.https_proxy);
-			}
-			catch (e) {
-				console.error("Install https-proxy-agent to use an HTTP/HTTPS proxy");
-				process.exit(-1);
-			}
-		}
-
-		return options;
-	}
 
 	function onResponse(response) {
 		var status = response.statusCode;
@@ -176,12 +243,16 @@ function fetch(database, cb) {
 
 	mkdir(tmpFile);
 
-	var client = https.get(getOptions(), onResponse);
+	var client = https.get(getHTTPOptions(downloadUrl), onResponse);
 
 	process.stdout.write('Retrieving ' + fileName + ' ...');
 }
 
 function extract(tmpFile, tmpFileName, database, cb) {
+	if (database.skip) {
+		return cb(null, database);
+	}
+    
 	if (path.extname(tmpFileName) !== '.zip') {
 		cb(null, database);
 	} else {
@@ -214,11 +285,13 @@ function extract(tmpFile, tmpFileName, database, cb) {
 				}
 			});
 			zipfile.once("end", function() {
+				console.log(' DONE'.green);
 				cb(null, database);
 			});
 		});
 	}
 }
+
 function processLookupCountry(src, cb){
 	function processLine(line) {
 		var fields = CSVtoArray(line);
@@ -469,7 +542,7 @@ function processCityDataNames(src, dest, cb) {
 		}
 		b.write(eu,9);//is in eu
 		b.write(tz,10);//timezone
-		b.write(city, 34);//cityname
+		b.write(city, 42);//cityname
 
 		fs.writeSync(datFile, b, 0, b.length, null);
 		linesCount++;
@@ -493,6 +566,10 @@ function processCityDataNames(src, dest, cb) {
 }
 
 function processData(database, cb) {
+	if (database.skip) {
+		return cb(null, database);
+	}
+    
 	var type = database.type;
 	var src = database.src;
 	var dest = database.dest;
@@ -501,12 +578,16 @@ function processData(database, cb) {
 		if(Array.isArray(src)){
 			processLookupCountry(src[0], function() {
 				processCountryData(src[1], dest[1], function() {
-					processCountryData(src[2], dest[2], cb);
+					processCountryData(src[2], dest[2], function() {
+						cb(null, database);
+					});
 				});
 			});
 		}
 		else{
-			processCountryData(src, dest, cb);
+			processCountryData(src, dest, function() {
+				cb(null, database);
+			});
 		}
 	} else if (type === 'city') {
 		processCityDataNames(src[0], dest[0], function() {
@@ -514,11 +595,22 @@ function processData(database, cb) {
 				console.log("city data processed");
 				processCityData(src[2], dest[2], function() {
 					console.log(' DONE'.green);
-					cb();
+					cb(null, database);
 				});
 			});
 		});
 	}
+}
+
+function updateChecksum(database, cb) {
+	if (database.skip || !database.checkValue) {
+		//don't need to update checksums cause it was not fetched or did not change
+		return cb();
+	}
+	fs.writeFile(path.join(dataPath, database.type+".checksum"), database.checkValue, 'utf8', function(err){
+		if (err) console.log('Failed to Update checksums.'.red, "Database:", database.type);
+		cb();
+	});
 }
 
 rimraf(tmpPath);
@@ -526,15 +618,15 @@ mkdir(tmpPath);
 
 async.eachSeries(databases, function(database, nextDatabase) {
 
-	async.seq(fetch, extract, processData)(database, nextDatabase);
+	async.seq(check, fetch, extract, processData, updateChecksum)(database, nextDatabase);
 
 }, function(err) {
 	if (err) {
-		console.log('Failed to Update Databases from MaxMind.'.red);
+		console.log('Failed to Update Databases from MaxMind.'.red, err);
 		process.exit(1);
 	} else {
 		console.log('Successfully Updated Databases from MaxMind.'.green);
-		if (process.argv[2] == 'debug') console.log('Notice: temporary files are not deleted for debug purposes.'.bold.yellow);
+		if (args.indexOf("debug") !== -1) console.log('Notice: temporary files are not deleted for debug purposes.'.bold.yellow);
 		else rimraf(tmpPath);
 		process.exit(0);
 	}

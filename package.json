@@ -13,7 +13,8 @@
         "pretest": "eslint .",
 		"test": "nodeunit --reporter=minimal test/tests.js",
 		"updatedb": "node scripts/updatedb.js",
-		"updatedb-debug": "node scripts/updatedb.js debug"
+		"updatedb-debug": "node scripts/updatedb.js debug",
+		"updatedb-force": "node scripts/updatedb.js force"
 	},
 	"dependencies": {
 		"async": "^2.1.1",
