@@ -10,6 +10,7 @@
 	"repository"  :  { "type": "git", "url": "git://github.com/bluesmoon/node-geoip.git" },
 	"engines"     :  { "node": ">=5.10.0" },
 	"scripts": {
+        "pretest": "eslint .",
 		"test": "nodeunit --reporter=minimal test/tests.js",
 		"updatedb": "node scripts/updatedb.js",
 		"updatedb-debug": "node scripts/updatedb.js debug",
@@ -18,7 +19,7 @@
 	"dependencies": {
 		"async": "^2.1.1",
 		"colors": "^1.1.2",
-		"glob": "^7.1.1",
+        "eslint": "^5.12.1",
 		"iconv-lite": "^0.4.13",
 		"ip-address": "^5.8.9",
 		"lazy": "^1.0.11",

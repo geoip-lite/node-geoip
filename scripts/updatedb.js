@@ -13,8 +13,7 @@ var zlib = require('zlib');
 fs.existsSync = fs.existsSync || path.existsSync;
 
 var async = require('async');
-var colors = require('colors');
-var glob = require('glob');
+var colors = require('colors'); // eslint-disable-line no-unused-vars
 var iconv = require('iconv-lite');
 var lazy = require('lazy');
 var rimraf = require('rimraf').sync;
@@ -294,7 +293,6 @@ function extract(tmpFile, tmpFileName, database, cb) {
 }
 
 function processLookupCountry(src, cb){
-	var lines=0;
 	function processLine(line) {
 		var fields = CSVtoArray(line);
 		if (!fields || fields.length < 6) {
@@ -306,7 +304,6 @@ function processLookupCountry(src, cb){
 	var tmpDataFile = path.join(tmpPath, src);
 
 	process.stdout.write('Processing Lookup Data (may take a moment) ...');
-	var tstart = Date.now();
 
 	lazy(fs.createReadStream(tmpDataFile))
 		.lines
@@ -420,6 +417,9 @@ function processCityData(src, dest, cb) {
 		var locId;
 		var b;
 		var bsz;
+		var lat;
+		var lon;
+		var area;
 
 		var i;
 
@@ -449,9 +449,9 @@ function processCityData(src, dest, cb) {
 			}
 			b.writeUInt32BE(locId>>>0, 32);
 			
-			var lat = Math.round(parseFloat(fields[7]) * 10000);
-			var lon = Math.round(parseFloat(fields[8]) * 10000);
-			var area = parseInt(fields[9], 10);
+			lat = Math.round(parseFloat(fields[7]) * 10000);
+			lon = Math.round(parseFloat(fields[8]) * 10000);
+			area = parseInt(fields[9], 10);
 			b.writeInt32BE(lat,36);
 			b.writeInt32BE(lon,40);
 			b.writeInt32BE(area,44);
@@ -470,9 +470,9 @@ function processCityData(src, dest, cb) {
 			b.writeUInt32BE(eip>>>0, 4);
 			b.writeUInt32BE(locId>>>0, 8);
 
-			var lat = Math.round(parseFloat(fields[7]) * 10000);
-			var lon = Math.round(parseFloat(fields[8]) * 10000);
-			var area = parseInt(fields[9], 10);
+			lat = Math.round(parseFloat(fields[7]) * 10000);
+			lon = Math.round(parseFloat(fields[8]) * 10000);
+			area = parseInt(fields[9], 10);
 			b.writeInt32BE(lat,12);
 			b.writeInt32BE(lon,16);
 			b.writeInt32BE(area,20);
@@ -507,7 +507,7 @@ function processCityData(src, dest, cb) {
 function processCityDataNames(src, dest, cb) {
 	var locId = null;
 	var linesCount = 0;
-	function processLine(line, i, a) {
+	function processLine(line) {
 		if (line.match(/^Copyright/) || !line.match(/\d/)) {
 			return;
 		}
