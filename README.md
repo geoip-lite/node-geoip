@@ -124,18 +124,40 @@ the `pretty` method can be used to turn it into a human readable string.
 This method returns a string if the input was in a format that `geoip-lite` can recognise, else it returns the
 input itself.
 
-### Start and stop watching for data updates ###
+Built-in Updater
+----------------
 
-If you have a server running `geoip-lite`, and you want to update its geo data without a restart, you can enable
-the data watcher to automatically refresh in-memory geo data when a file changes in the data directory.
+This package contains an update script that can pull the files from MaxMind and handle the conversion from CSV.
+A npm script alias has been setup to make this process easy. Please keep in mind this requires internet and MaxMind
+rate limits that amount of downloads on their servers.
 
-```javascript
-geoip.startWatchingDataUpdate();
+Package stores checksums of MaxMind data and by default only downloads them if checksums have changed.
+
+### Ways to update data ###
+
+```shell
+#update data if new data is available
+npm run-script updatedb
+
+#force udpate data even if checkums have not changed
+npm run-script updatedb force
 ```
 
-This tool can be used with `npm run-script updatedb` to periodically update geo data on a running server.
+You can also run it by doing:
 
-Additionally, if you schedule upgrades, you can programmatically make geoip reload the data from new database
+```bash
+node ./node_modules/geoip-lite/scripts/updatedb.js
+```
+
+Or, if you really want, run the update once by `require('geoip-lite/scripts/updatedb.js')`.
+
+### Ways to reload data in your app when update finished ###
+
+If you have a server running `geoip-lite`, and you want to reload its geo data, after you finished update, without a restart.
+
+#### Programmatically ####
+
+You can do it programmatically, calling after scheduled data updates
 
 ```javascript
 //Synchronously
@@ -147,25 +169,15 @@ geoip.reloadData(function(){
 });
 ```
 
+#### Automatic Start and stop watching for data updates ####
 
-Built-in Updater
-----------------
+You can enable the data watcher to automatically refresh in-memory geo data when a file changes in the data directory.
 
-This package contains an update script that can pull the files from MaxMind and handle the conversion from CSV.
-A npm script alias has been setup to make this process easy. Please keep in mind this requires internet and MaxMind
-rate limits that amount of downloads on their servers.
-
-```shell
-npm run-script updatedb
+```javascript
+geoip.startWatchingDataUpdate();
 ```
 
-You can also run it by doing:
-
-```bash
-node ./node_modules/geoip-lite/scripts/updatedb.js
-```
-
-Or, if you really want, run the update once by `require('geoip-lite/scripts/updatedb.js')`.
+This tool can be used with `npm run-script updatedb` to periodically update geo data on a running server.
 
 Caveats
 -------
@@ -178,6 +190,24 @@ geoip-lite understands.  You will need to use the `.csv` files from MaxMind for 
 Also note that on occassion, the library may take up to 5 seconds to load into memory.  This is largely dependent on
 how busy your disk is at that time.  It can take as little as 200ms on a lightly loaded disk.  This is a one time
 cost though, and you make it up at run time with very fast lookups.
+
+### Memory usage ###
+
+Quick test on memory consumption shows that library uses around 100Mb per process
+
+```javascript
+    var geoip = require('geoip-lite');
+    console.log(process.memoryUsage());
+    /**
+    * Outputs:
+    * { 
+    *     rss: 126365696,
+    *     heapTotal: 10305536,
+    *     heapUsed: 5168944,
+    *     external: 104347120 
+    * }
+    **/
+```
 
 References
 ----------
