@@ -19,7 +19,6 @@
 	"dependencies": {
 		"async": "^2.1.1",
 		"colors": "^1.1.2",
-        "eslint": "^5.12.1",
 		"iconv-lite": "^0.4.13",
 		"ip-address": "^5.8.9",
 		"lazy": "^1.0.11",
@@ -30,6 +29,7 @@
 		"update": true
 	},
 	"devDependencies": {
+		"eslint": "^5.12.1",
 		"nodeunit": "^0.11.2"
 	},
 	"license": "Apache-2.0"
