@@ -5,6 +5,7 @@
 var user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36';
 
 var fs = require('fs');
+var http = require('http');
 var https = require('https');
 var path = require('path');
 var url = require('url');
@@ -160,7 +161,7 @@ function check(database, cb) {
 			var status = response.statusCode;
     
 			if (status !== 200) {
-				console.log('ERROR'.red + ': HTTP Request Failed [%d %s]', status, https.STATUS_CODES[status]);
+				console.log('ERROR'.red + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 				client.abort();
 				process.exit();
 			}
@@ -221,7 +222,7 @@ function fetch(database, cb) {
 		var status = response.statusCode;
 
 		if (status !== 200) {
-			console.log('ERROR'.red + ': HTTP Request Failed [%d %s]', status, https.STATUS_CODES[status]);
+			console.log('ERROR'.red + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 			client.abort();
 			process.exit();
 		}
