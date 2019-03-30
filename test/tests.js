@@ -107,5 +107,66 @@ module.exports = {
 		test.equal(actual.metro, 623);
 
 		test.done();
+	},
+    
+	testSyncReload: function (test) {
+		test.expect(6);
+
+		//get original data
+		var before4 = geoip.lookup("75.82.117.180");
+		test.notEqual(before4, null);
+        
+		var before6 = geoip.lookup("::ffff:173.185.182.82");
+		test.notEqual(before6, null);
+        
+		//clear data;
+		geoip.clear();
+        
+		//make sure data is cleared
+		var none4 = geoip.lookup("75.82.117.180");
+		test.equal(none4, null);
+		var none6 = geoip.lookup("::ffff:173.185.182.82");
+		test.equal(none6, null);
+        
+		//reload data synchronized
+		geoip.reloadDataSync();
+        
+		//make sure we have value from before
+		var after4 = geoip.lookup("75.82.117.180");
+		test.deepEqual(before4, after4);
+		var after6 = geoip.lookup("::ffff:173.185.182.82");
+		test.deepEqual(before6, after6);
+
+		test.done();
+	},
+    
+	testAsyncReload: function (test) {
+		test.expect(6);
+
+		//get original data
+		var before4 = geoip.lookup("75.82.117.180");
+		test.notEqual(before4, null);
+		var before6 = geoip.lookup("::ffff:173.185.182.82");
+		test.notEqual(before6, null);
+        
+		//clear data;
+		geoip.clear();
+        
+		//make sure data is cleared
+		var none4 = geoip.lookup("75.82.117.180");
+		test.equal(none4, null);
+		var none6 = geoip.lookup("::ffff:173.185.182.82");
+		test.equal(none6, null);
+        
+		//reload data asynchronously
+		geoip.reloadData(function(){
+			//make sure we have value from before
+			var after4 = geoip.lookup("75.82.117.180");
+			test.deepEqual(before4, after4);
+			var after6 = geoip.lookup("::ffff:173.185.182.82");
+			test.deepEqual(before6, after6);
+
+			test.done(); 
+		});
 	}
 };
