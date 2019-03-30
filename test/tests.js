@@ -63,13 +63,13 @@ module.exports = {
         
 		test.strictEqual(actual.timezone, 'Europe/Amsterdam', "should match timezone");
         
-		test.strictEqual(actual.city, 'Amsterdam', "should match city");
+		test.strictEqual(actual.city, 'Badhoevedorp', "should match city");
         
 		test.ok(actual.ll, 'should contain coordinates');
         
 		test.strictEqual(actual.metro, 0, "should match metro");
         
-		test.strictEqual(actual.area, 50, "should match area");
+		test.strictEqual(actual.area, 10, "should match area");
 
 		test.done();
 	},
@@ -77,7 +77,7 @@ module.exports = {
 	testUTF8: function(test) {
 		test.expect(2);
 
-		var ip = "95.17.102.184";
+		var ip = "2.139.175.1";
 		var expected = "Logroño";
 		var actual = geoip.lookup(ip);
 
@@ -92,7 +92,7 @@ module.exports = {
 
 		var actual = geoip.lookup("23.240.63.68");
 
-		test.equal(actual.city, "Perris");//keeps changing with each update from one city to other (close to each other geographically)
+		test.equal(actual.city, "Nuevo");//keeps changing with each update from one city to other (close to each other geographically)
 		test.equal(actual.metro, 803);
 
 		test.done();
