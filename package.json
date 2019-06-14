@@ -30,7 +30,7 @@
 	},
 	"scripts": {
 		"pretest": "eslint .",
-		"test": "nodeunit --reporter=minimal test/tests.js",
+		"test": "GEOIP_EXCLUDE_CITY_DATA=true nodeunit --reporter=minimal test/tests.js && nodeunit --reporter=minimal test/tests.js",
 		"updatedb": "node scripts/updatedb.js",
 		"updatedb-debug": "node scripts/updatedb.js debug",
 		"updatedb-force": "node scripts/updatedb.js force"

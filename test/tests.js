@@ -1,4 +1,5 @@
 var geoip = require('../lib/geoip');
+var INCLUDE_CITY_DATA=(process.env.GEOIP_EXCLUDE_CITY_DATA !== "true");
 
 module.exports = {
 	testLookup: function(test) {
@@ -19,7 +20,7 @@ module.exports = {
 	},
     
 	testDataIP4: function(test) {
-		test.expect(9);
+		test.expect(INCLUDE_CITY_DATA ? 9 : 3);
 
 		var ip = '72.229.28.185';
 
@@ -28,26 +29,28 @@ module.exports = {
 		test.notStrictEqual(actual.range, undefined, 'should contain IPv4 range');
         
 		test.strictEqual(actual.country, 'US', "should match country");
+		
+		if (INCLUDE_CITY_DATA) {
+			test.strictEqual(actual.region, 'NY', "should match region");
         
-		test.strictEqual(actual.region, 'NY', "should match region");
+			test.strictEqual(actual.eu, '0', "should match eu");
+					
+			test.strictEqual(actual.timezone, 'America/New_York', "should match timezone");
+					
+			test.strictEqual(actual.city, 'New York', "should match city");
+			
+			test.strictEqual(actual.metro, 501, "should match metro");
         
-		test.strictEqual(actual.eu, '0', "should match eu");
-        
-		test.strictEqual(actual.timezone, 'America/New_York', "should match timezone");
-        
-		test.strictEqual(actual.city, 'New York', "should match city");
+			test.strictEqual(actual.area, 1, "should match area");
+		}
         
 		test.ok(actual.ll, 'should contain coordinates');
-        
-		test.strictEqual(actual.metro, 501, "should match metro");
-        
-		test.strictEqual(actual.area, 1, "should match area");
 
 		test.done();
 	},
     
 	testDataIP6: function(test) {
-		test.expect(9);
+		test.expect(INCLUDE_CITY_DATA ? 9 : 3);
 
 		var ipv6 = '2001:1c04:400::1';
 
@@ -56,55 +59,65 @@ module.exports = {
 		test.notStrictEqual(actual.range, undefined, 'should contain IPv6 range');
         
 		test.strictEqual(actual.country, 'NL', "should match country");
+		
+		if (INCLUDE_CITY_DATA) {
+
+			test.strictEqual(actual.region, 'NH', "should match region");
+					
+			test.strictEqual(actual.eu, '1', "should match eu");
+					
+			test.strictEqual(actual.timezone, 'Europe/Amsterdam', "should match timezone");
+					
+			test.strictEqual(actual.city, 'Badhoevedorp', "should match city");
+				
+			test.strictEqual(actual.metro, 0, "should match metro");
         
-		test.strictEqual(actual.region, 'NH', "should match region");
-        
-		test.strictEqual(actual.eu, '1', "should match eu");
-        
-		test.strictEqual(actual.timezone, 'Europe/Amsterdam', "should match timezone");
-        
-		test.strictEqual(actual.city, 'Badhoevedorp', "should match city");
-        
+			test.strictEqual(actual.area, 10, "should match area");
+		}
+
 		test.ok(actual.ll, 'should contain coordinates');
-        
-		test.strictEqual(actual.metro, 0, "should match metro");
-        
-		test.strictEqual(actual.area, 10, "should match area");
 
 		test.done();
 	},
 
 	testUTF8: function(test) {
-		test.expect(2);
+		test.expect(INCLUDE_CITY_DATA ? 2 : 1);
 
 		var ip = "2.139.175.1";
 		var expected = "Logroño";
 		var actual = geoip.lookup(ip);
 
 		test.ok(actual, "Should return a non-null value for " + ip);
-		test.equal(actual.city, expected, "UTF8 city name does not match");
+
+		if (INCLUDE_CITY_DATA) {
+			test.equal(actual.city, expected, "UTF8 city name does not match");
+		}
 
 		test.done();
 	},
 
 	testMetro: function(test) {
-		test.expect(2);
+		test.expect(INCLUDE_CITY_DATA ? 2 : 0);
 
 		var actual = geoip.lookup("23.240.63.68");
 
-		test.equal(actual.city, "Nuevo");//keeps changing with each update from one city to other (close to each other geographically)
-		test.equal(actual.metro, 803);
+		if (INCLUDE_CITY_DATA) {
+			test.equal(actual.city, "Nuevo");//keeps changing with each update from one city to other (close to each other geographically)
+			test.equal(actual.metro, 803);
+		}
 
 		test.done();
 	},
 
 	testIPv4MappedIPv6: function (test) {
-		test.expect(2);
+		test.expect(INCLUDE_CITY_DATA ? 2 : 0);
 
 		var actual = geoip.lookup("::ffff:173.185.182.82");
 
-		test.equal(actual.city, "Granbury");
-		test.equal(actual.metro, 623);
+		if (INCLUDE_CITY_DATA) {
+			test.equal(actual.city, "Granbury");
+			test.equal(actual.metro, 623);
+		}
 
 		test.done();
 	},
