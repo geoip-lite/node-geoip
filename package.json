@@ -11,7 +11,7 @@
 	"engines"     :  { "node": ">=5.10.0" },
 	"scripts": {
         "pretest": "eslint .",
-		"test": "nodeunit --reporter=minimal test/tests.js",
+		"test": "GEOIP_EXCLUDE_CITY_DATA=true nodeunit --reporter=minimal test/tests.js && nodeunit --reporter=minimal test/tests.js",
 		"updatedb": "node scripts/updatedb.js",
 		"updatedb-debug": "node scripts/updatedb.js debug",
 		"updatedb-force": "node scripts/updatedb.js force"
@@ -19,6 +19,7 @@
 	"dependencies": {
 		"async": "^2.1.1",
 		"colors": "^1.1.2",
+		"dotenv": "^8.0.0",
 		"iconv-lite": "^0.4.13",
 		"ip-address": "^5.8.9",
 		"lazy": "^1.0.11",
