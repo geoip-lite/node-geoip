@@ -67,7 +67,7 @@ installation
 
 ### 2. update the datafiles (optional)
 
-Run `cd node_modules/geoip-lite && npm run-script updatedb` to update the data files.
+Run `cd node_modules/geoip-lite && npm run-script updatedb YOUR_LICENSE_KEY` to update the data files. (Replace `YOUR_LICENSE_KEY` with your license key obtained from [maxmind.com](https://support.maxmind.com/account-faq/account-related/how-do-i-generate-a-license-key/))
 
 **NOTE** that this requires a lot of RAM.  It is known to fail on on a Digital Ocean or AWS micro instance.
 There are no plans to change this.  `geoip-lite` stores all data in RAM in order to be fast.
