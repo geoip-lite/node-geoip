@@ -621,7 +621,7 @@ function updateChecksum(database, cb) {
 
 if (!license_key) {
 	console.log('ERROR'.red + ': Missing license_key');
-	process.exit();
+	process.exit(1);
 }
 
 rimraf(tmpPath);
