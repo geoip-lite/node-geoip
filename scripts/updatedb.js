@@ -163,7 +163,7 @@ function check(database, cb) {
 			database.checkValue = data;
 		}
 		
-		console.log('Checking ', checksumUrl);
+		console.log('Checking ', database.fileName);
         
 		function onResponse(response) {
 			var status = response.statusCode;
@@ -224,7 +224,7 @@ function fetch(database, cb) {
 		return cb(null, tmpFile, fileName, database);
 	}
 
-	console.log('Fetching ', downloadUrl);
+	console.log('Fetching ', fileName);
 
 	function onResponse(response) {
 		var status = response.statusCode;
