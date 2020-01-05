@@ -27,6 +27,9 @@ var args = process.argv.slice(2);
 var license_key = args.find(function(arg) {
 	return arg.match(/^license_key=[a-zA-Z0-9]+/) !== null;
 });
+if (typeof license_key === 'undefined' && typeof process.env.LICENSE_KEY !== 'undefined') {
+	license_key = 'license_key='+process.env.LICENSE_KEY;
+}
 var dataPath = path.join(__dirname, '..', 'data');
 var tmpPath = path.join(__dirname, '..', 'tmp');
 var countryLookup = {};
