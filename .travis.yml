@@ -9,9 +9,6 @@ install:
 - npm install
 script:
 - npm test
-- npm run-script updatedb license_key=$LICENSE_KEY
-- npm run-script updatedb force license_key=$LICENSE_KEY
-# Reads the $LICENSE_KEY
 - npm run-script updatedb
 - npm run-script updatedb force
 env:
