@@ -24,6 +24,12 @@ var Address6 = require('ip-address').Address6;
 var Address4 = require('ip-address').Address4;
 
 var args = process.argv.slice(2);
+var license_key = args.find(function(arg) {
+	return arg.match(/^license_key=[a-zA-Z0-9]+/) !== null;
+});
+if (typeof license_key === 'undefined' && typeof process.env.LICENSE_KEY !== 'undefined') {
+	license_key = 'license_key='+process.env.LICENSE_KEY;
+}
 var dataPath = path.join(__dirname, '..', 'data');
 var tmpPath = path.join(__dirname, '..', 'tmp');
 var countryLookup = {};
@@ -31,8 +37,9 @@ var cityLookup = {};
 var databases = [
 	{
 		type: 'country',
-		url: 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country-CSV.zip',
-		checksum: 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.md5',
+		url: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip&'+license_key,
+		checksum: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip.md5&'+license_key,
+		fileName: 'GeoLite2-Country-CSV.zip',
 		src: [
 			'GeoLite2-Country-Locations-en.csv',
 			'GeoLite2-Country-Blocks-IPv4.csv',
@@ -46,8 +53,9 @@ var databases = [
 	},
 	{
 		type: 'city',
-		url: 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip',
-		checksum: 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.md5',
+		url: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip&'+license_key,
+		checksum: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip.md5&'+license_key,
+		fileName: 'GeoLite2-City-CSV.zip',
 		src: [
 			'GeoLite2-City-Locations-en.csv',
 			'GeoLite2-City-Blocks-IPv4.csv',
@@ -141,7 +149,7 @@ function check(database, cb) {
 		//so not even using checksums
 		return cb(null, database);
 	}
-    
+	
 	var checksumUrl = database.checksum;
     
 	if (typeof checksumUrl === "undefined") {
@@ -154,8 +162,8 @@ function check(database, cb) {
 		if (!err && data && data.length) {
 			database.checkValue = data;
 		}
-        
-		console.log('Checking ', checksumUrl);
+		
+		console.log('Checking ', database.fileName);
         
 		function onResponse(response) {
 			var status = response.statusCode;
@@ -203,7 +211,7 @@ function fetch(database, cb) {
 	}
 
 	var downloadUrl = database.url;
-	var fileName = downloadUrl.split('/').pop();
+	var fileName = database.fileName;
 	var gzip = path.extname(fileName) === '.gz';
 
 	if (gzip) {
@@ -216,7 +224,7 @@ function fetch(database, cb) {
 		return cb(null, tmpFile, fileName, database);
 	}
 
-	console.log('Fetching ', downloadUrl);
+	console.log('Fetching ', fileName);
 
 	function onResponse(response) {
 		var status = response.statusCode;
@@ -253,7 +261,7 @@ function extract(tmpFile, tmpFileName, database, cb) {
 	if (database.skip) {
 		return cb(null, database);
 	}
-    
+	
 	if (path.extname(tmpFileName) !== '.zip') {
 		cb(null, database);
 	} else {
@@ -612,6 +620,11 @@ function updateChecksum(database, cb) {
 		if (err) console.log('Failed to Update checksums.'.red, "Database:", database.type);
 		cb();
 	});
+}
+
+if (!license_key) {
+	console.log('ERROR'.red + ': Missing license_key');
+	process.exit(1);
 }
 
 rimraf(tmpPath);
