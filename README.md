@@ -133,25 +133,25 @@ This package contains an update script that can pull the files from MaxMind and 
 A npm script alias has been setup to make this process easy. Please keep in mind this requires internet and MaxMind
 rate limits that amount of downloads on their servers.
 
+You will need, at minimum, a free license key obtained from [maxmind.com](https://support.maxmind.com/account-faq/account-related/how-do-i-generate-a-license-key/) to run the update script.
+
 Package stores checksums of MaxMind data and by default only downloads them if checksums have changed.
 
 ### Ways to update data ###
 
 ```shell
 #update data if new data is available
-npm run-script updatedb
+npm run-script updatedb license_key=YOUR_LICENSE_KEY
 
 #force udpate data even if checkums have not changed
-npm run-script updatedb force
+npm run-script updatedb-force license_key=YOUR_LICENSE_KEY
 ```
 
 You can also run it by doing:
 
 ```bash
-node ./node_modules/geoip-lite/scripts/updatedb.js
+node ./node_modules/geoip-lite/scripts/updatedb.js license_key=YOUR_LICENSE_KEY
 ```
-
-Or, if you really want, run the update once by `require('geoip-lite/scripts/updatedb.js')`.
 
 ### Ways to reload data in your app when update finished ###
 
@@ -202,11 +202,11 @@ Quick test on memory consumption shows that library uses around 100Mb per proces
     console.log(process.memoryUsage());
     /**
     * Outputs:
-    * { 
+    * {
     *     rss: 126365696,
     *     heapTotal: 10305536,
     *     heapUsed: 5168944,
-    *     external: 104347120 
+    *     external: 104347120
     * }
     **/
 ```
