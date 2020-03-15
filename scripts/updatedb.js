@@ -37,8 +37,8 @@ var cityLookup = {};
 var databases = [
 	{
 		type: 'country',
-		url: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip&'+license_key,
-		checksum: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip.md5&'+license_key,
+		url: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip&'+license_key,
+		checksum: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip.md5&'+license_key,
 		fileName: 'GeoLite2-Country-CSV.zip',
 		src: [
 			'GeoLite2-Country-Locations-en.csv',
@@ -53,8 +53,8 @@ var databases = [
 	},
 	{
 		type: 'city',
-		url: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip&'+license_key,
-		checksum: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip.md5&'+license_key,
+		url: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip&'+license_key,
+		checksum: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip.md5&'+license_key,
 		fileName: 'GeoLite2-City-CSV.zip',
 		src: [
 			'GeoLite2-City-Locations-en.csv',
