@@ -158,7 +158,7 @@ function check(database, cb) {
 	}
     
 	//read existing checksum file
-	fs.readFile(path.join(dataPath, database.type+".checksum"), function(err, data) {
+	fs.readFile(path.join(dataPath, database.type+".checksum"), {encoding: 'utf8'}, function(err, data) {
 		if (!err && data && data.length) {
 			database.checkValue = data;
 		}
