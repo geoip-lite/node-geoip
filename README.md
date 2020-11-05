@@ -211,6 +211,10 @@ Quick test on memory consumption shows that library uses around 100Mb per proces
     **/
 ```
 
+Alternatives
+----------
+If your use-case requires doing less than 100 queries through the lifetime of your application or if you need really fast latency on start-up, you might want to look into [fast-geoip](https://github.com/onramper/fast-geoip) a package with a compatible API that is optimized for serverless environments and provides faster boot times and lower memory consumption at the expense of longer lookup times.
+
 References
 ----------
   - <a href="http://www.maxmind.com/app/iso3166">Documentation from MaxMind</a>
