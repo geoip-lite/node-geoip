@@ -377,14 +377,18 @@ async function processCountryData(src, dest) {
 			}
 	
 			b.write(cc, bsz - 2);
-	
-			await new Promise(resolve => {
-				fs.write(datFile, b, 0, bsz, null, resolve);
-			});
 
 			if(Date.now() - tstart > 5000) {
 				tstart = Date.now();
 				process.stdout.write('\nStill working (' + lines + ') ...');
+			}
+
+			if(datFile._writableState.needDrain) {
+				return new Promise((resolve) => {
+					datFile.write(b, resolve);
+				});
+			} else {
+				return datFile.write(b);
 			}
 		}
 	}
@@ -397,7 +401,7 @@ async function processCountryData(src, dest) {
 
 	process.stdout.write('Processing Data (may take a moment) ...');
 	var tstart = Date.now();
-	var datFile = fs.openSync(dataFile, "w");
+	var datFile = fs.createWriteStream(dataFile);
 
 	var rl = readline.createInterface({
 		input: fs.createReadStream(tmpDataFile),
@@ -409,6 +413,7 @@ async function processCountryData(src, dest) {
 		if(i == 1) continue;
 		await processLine(line);
 	}
+	datFile.close();
 	console.log(' DONE'.green);
 }
 
@@ -495,9 +500,15 @@ async function processCityData(src, dest) {
 			tstart = Date.now();
 			process.stdout.write('\nStill working (' + lines + ') ...');
 		}
-		return new Promise(resolve => {
-			fs.write(datFile, b, 0, b.length, null, resolve);
-		});
+
+
+		if(datFile._writableState.needDrain) {
+			return new Promise((resolve) => {
+				datFile.write(b, resolve);
+			});
+		} else {
+			return datFile.write(b);
+		}
 	}
 
 	var dataFile = path.join(dataPath, dest);
@@ -507,7 +518,7 @@ async function processCityData(src, dest) {
 
 	process.stdout.write('Processing Data (may take a moment) ...');
 	var tstart = Date.now();
-	var datFile = fs.openSync(dataFile, "w");
+	var datFile = fs.createWriteStream(dataFile);
 
 	var rl = readline.createInterface({
 		input: fs.createReadStream(tmpDataFile),
@@ -519,6 +530,7 @@ async function processCityData(src, dest) {
 		if(i == 1) continue;
 		await processLine(line);
 	}
+	datFile.close();
 }
 
 function processCityDataNames(src, dest, cb) {
