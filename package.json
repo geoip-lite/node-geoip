@@ -1,6 +1,6 @@
 {
 	"name"        :  "geoip-lite",
-	"version"     :  "1.4.2",
+	"version"     :  "1.4.3",
 	"description" :  "A light weight native JavaScript implementation of GeoIP API from MaxMind",
 	"keywords"    :  ["geo", "geoip", "ip", "ipv4", "ipv6", "geolookup", "maxmind", "geolite"],
 	"homepage"    :  "https://github.com/geoip-lite/node-geoip",
@@ -17,13 +17,13 @@
 		"updatedb-force": "node scripts/updatedb.js force"
 	},
 	"dependencies": {
-		"async": "^2.1.1",
-		"chalk": "^4.1.2",
-		"iconv-lite": "^0.4.13",
-		"ip-address": "^5.8.9",
-		"lazy": "^1.0.11",
-		"rimraf": "^2.5.2",
-		"yauzl": "^2.9.2"
+		"async": "2.1 - 2.6.3",
+		"chalk": "4.1 - 4.1.2",
+		"iconv-lite": "0.4.13 - 0.6.3",
+		"ip-address": "5.8.9 - 5.9.4",
+		"lazy": "1.0.11",
+		"rimraf": "2.5.2 - 2.7.1",
+		"yauzl": "2.9.2 - 2.10.0"
 	},
 	"config": {
 		"update": true
