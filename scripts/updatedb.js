@@ -14,7 +14,7 @@ var zlib = require('zlib');
 fs.existsSync = fs.existsSync || path.existsSync;
 
 var async = require('async');
-var colors = require('colors'); // eslint-disable-line no-unused-vars
+var chalk = require('chalk');
 var iconv = require('iconv-lite');
 var lazy = require('lazy');
 var rimraf = require('rimraf').sync;
@@ -169,7 +169,7 @@ function check(database, cb) {
 			var status = response.statusCode;
     
 			if (status !== 200) {
-				console.log('ERROR'.red + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
+				console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 				client.abort();
 				process.exit();
 			}
@@ -182,16 +182,16 @@ function check(database, cb) {
 			response.on("end", function () {
 				if (str && str.length) {
 					if (str == database.checkValue) {
-						console.log(('Database "' + database.type + '" is up to date').green);
+						console.log(chalk.green('Database "' + database.type + '" is up to date'));
 						database.skip = true;
 					}
 					else {
-						console.log(('Database ' + database.type + ' has new data').green);
+						console.log(chalk.green('Database ' + database.type + ' has new data'));
 						database.checkValue = str;
 					}
 				}
 				else {
-					console.log('ERROR'.red + ': Could not retrieve checksum for', database.type, 'Aborting'.red);
+					console.log(chalk.red('ERROR') + ': Could not retrieve checksum for', database.type, chalk.red('Aborting'));
 					console.log('Run with "force" to update without checksum');
 					client.abort();
 					process.exit();
@@ -230,7 +230,7 @@ function fetch(database, cb) {
 		var status = response.statusCode;
 
 		if (status !== 200) {
-			console.log('ERROR'.red + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
+			console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 			client.abort();
 			process.exit();
 		}
@@ -245,7 +245,7 @@ function fetch(database, cb) {
 		}
 
 		tmpFilePipe.on('close', function() {
-			console.log(' DONE'.green);
+			console.log(chalk.green(' DONE'));
 			cb(null, tmpFile, fileName, database);
 		});
 	}
@@ -294,7 +294,7 @@ function extract(tmpFile, tmpFileName, database, cb) {
 				}
 			});
 			zipfile.once("end", function() {
-				console.log(' DONE'.green);
+				console.log(chalk.green(' DONE'));
 				cb(null, database);
 			});
 		});
@@ -322,7 +322,7 @@ function processLookupCountry(src, cb){
 		.skip(1)
 		.map(processLine)
 		.on('pipe', function() {
-			console.log(' DONE'.green);
+			console.log(chalk.green(' DONE'));
 			cb();
 		});
 }
@@ -403,7 +403,7 @@ function processCountryData(src, dest, cb) {
 		.skip(1)
 		.map(processLine)
 		.on('pipe', function() {
-			console.log(' DONE'.green);
+			console.log(chalk.green(' DONE'));
 			cb();
 		});
 }
@@ -603,7 +603,7 @@ function processData(database, cb) {
 			processCityData(src[1], dest[1], function() {
 				console.log("city data processed");
 				processCityData(src[2], dest[2], function() {
-					console.log(' DONE'.green);
+					console.log(chalk.green(' DONE'));
 					cb(null, database);
 				});
 			});
@@ -617,13 +617,13 @@ function updateChecksum(database, cb) {
 		return cb();
 	}
 	fs.writeFile(path.join(dataPath, database.type+".checksum"), database.checkValue, 'utf8', function(err){
-		if (err) console.log('Failed to Update checksums.'.red, "Database:", database.type);
+		if (err) console.log(chalk.red('Failed to Update checksums.'), "Database:", database.type);
 		cb();
 	});
 }
 
 if (!license_key) {
-	console.log('ERROR'.red + ': Missing license_key');
+	console.log(chalk.red('ERROR') + ': Missing license_key');
 	process.exit(1);
 }
 
@@ -636,11 +636,11 @@ async.eachSeries(databases, function(database, nextDatabase) {
 
 }, function(err) {
 	if (err) {
-		console.log('Failed to Update Databases from MaxMind.'.red, err);
+		console.log(chalk.red('Failed to Update Databases from MaxMind.'), err);
 		process.exit(1);
 	} else {
-		console.log('Successfully Updated Databases from MaxMind.'.green);
-		if (args.indexOf("debug") !== -1) console.log('Notice: temporary files are not deleted for debug purposes.'.bold.yellow);
+		console.log(chalk.green('Successfully Updated Databases from MaxMind.'));
+		if (args.indexOf("debug") !== -1) console.log(chalk.yellow.bold('Notice: temporary files are not deleted for debug purposes.'));
 		else rimraf(tmpPath);
 		process.exit(0);
 	}
