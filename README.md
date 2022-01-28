@@ -67,7 +67,7 @@ installation
 
 ### 2. update the datafiles (optional)
 
-Run `cd node_modules/geoip-lite && npm run-script updatedb license_key=YOUR_LICENSE_KEY` to update the data files. (Replace `YOUR_LICENSE_KEY` with your license key obtained from [maxmind.com](https://support.maxmind.com/account-faq/account-related/how-do-i-generate-a-license-key/))
+Run `cd node_modules/geoip-lite && npm run-script updatedb license_key=YOUR_LICENSE_KEY` to update the data files. (Replace `YOUR_LICENSE_KEY` with your license key obtained from [maxmind.com](https://support.maxmind.com/hc/en-us/articles/4407111582235-Generate-a-License-Key))
 
 You can create maxmind account [here](https://www.maxmind.com/en/geolite2/signup)
 
@@ -133,7 +133,7 @@ This package contains an update script that can pull the files from MaxMind and 
 A npm script alias has been setup to make this process easy. Please keep in mind this requires internet and MaxMind
 rate limits that amount of downloads on their servers.
 
-You will need, at minimum, a free license key obtained from [maxmind.com](https://support.maxmind.com/account-faq/account-related/how-do-i-generate-a-license-key/) to run the update script.
+You will need, at minimum, a free license key obtained from [maxmind.com](https://support.maxmind.com/hc/en-us/articles/4407111582235-Generate-a-License-Key) to run the update script.
 
 Package stores checksums of MaxMind data and by default only downloads them if checksums have changed.
 
