@@ -29,7 +29,7 @@ really hard to get libgeoip built for Mac OSX without using the library from Mac
 why geoip-lite
 --------------
 
-So why are we called geoip-lite?  `npm` already has a [geoip package](http://search.npmjs.org/#/geoip) which provides a JavaScript
+So why are we called geoip-lite?  `npm` already has a [geoip package](https://www.npmjs.com/search?q=geoip) which provides a JavaScript
 binding around libgeoip from MaxMind.  The `geoip` package is fully featured and supports everything that the MaxMind APIs support,
 however, it requires `libgeoip` to be installed on your system.
 
