@@ -29,13 +29,9 @@ really hard to get libgeoip built for Mac OSX without using the library from Mac
 why geoip-lite
 --------------
 
-So why are we called geoip-lite?  `npm` already has a [geoip package](http://search.npmjs.org/#/geoip) which provides a JavaScript
-binding around libgeoip from MaxMind.  The `geoip` package is fully featured and supports everything that the MaxMind APIs support,
-however, it requires `libgeoip` to be installed on your system.
-
-`geoip-lite` on the other hand is a fully JavaScript implementation.  It is not as fully featured as `geoip` however, by reducing its
-scope, it is about 40% faster at doing lookups.  On average, an IP to Location lookup should take 20 microseconds on a Macbook Pro.
-IPv4 addresses take about 6 microseconds, while IPv6 addresses take about 30 microseconds.
+`geoip-lite` is a fully JavaScript implementation of the MaxMind geoip API.  It is not as fully featured as bindings that use `libgeoip`.
+By reducing scope, this package is about 40% faster at doing lookups.  On average, an IP to Location lookup should take 20 microseconds on
+a Macbook Pro.  IPv4 addresses take about 6 microseconds, while IPv6 addresses take about 30 microseconds.
 
 synopsis
 --------
