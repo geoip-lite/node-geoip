@@ -41,7 +41,7 @@ module.exports = {
         
 		test.strictEqual(actual.metro, 501, "should match metro");
         
-		test.strictEqual(actual.area, 1, "should match area");
+		test.strictEqual(actual.area, 5, "should match area");
 
 		test.done();
 	},
@@ -69,7 +69,7 @@ module.exports = {
         
 		test.strictEqual(actual.metro, 0, "should match metro");
         
-		test.strictEqual(actual.area, 5, "should match area");
+		test.strictEqual(actual.area, 100, "should match area");
 
 		test.done();
 	},
@@ -78,7 +78,7 @@ module.exports = {
 		test.expect(2);
 
 		var ip = "2.139.175.1";
-		var expected = "Pamplona";
+		var expected = "Zaragoza";
 		var actual = geoip.lookup(ip);
 
 		test.ok(actual, "Should return a non-null value for " + ip);
