@@ -17,7 +17,7 @@
 		"updatedb-force": "node scripts/updatedb.js force"
 	},
 	"dependencies": {
-		"async": "2.1 - 2.6.3",
+		"async": "2.1 - 2.6.4",
 		"chalk": "4.1 - 4.1.2",
 		"iconv-lite": "0.4.13 - 0.6.3",
 		"ip-address": "5.8.9 - 5.9.4",
