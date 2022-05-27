@@ -31,7 +31,7 @@ if (typeof license_key === 'undefined' && typeof process.env.LICENSE_KEY !== 'un
 	license_key = 'license_key='+process.env.LICENSE_KEY;
 }
 var geodatadir = args.find(function(arg) {
-	return arg.match(/^geodatadir=([a-zA-Z0-9-\.\/]+)/) !== null;
+	return arg.match(/^geodatadir=[\w./]+/) !== null;
 });
 if (typeof geodatadir === 'undefined' && typeof process.env.GEODATADIR !== 'undefined') {
 	geodatadir = 'geodatadir='+process.env.GEODATADIR;
