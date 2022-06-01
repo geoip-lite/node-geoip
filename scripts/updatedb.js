@@ -30,7 +30,20 @@ var license_key = args.find(function(arg) {
 if (typeof license_key === 'undefined' && typeof process.env.LICENSE_KEY !== 'undefined') {
 	license_key = 'license_key='+process.env.LICENSE_KEY;
 }
+var geodatadir = args.find(function(arg) {
+	return arg.match(/^geodatadir=[\w./]+/) !== null;
+});
+if (typeof geodatadir === 'undefined' && typeof process.env.GEODATADIR !== 'undefined') {
+	geodatadir = 'geodatadir='+process.env.GEODATADIR;
+}
 var dataPath = path.join(__dirname, '..', 'data');
+if (typeof geodatadir !== 'undefined') {
+	dataPath = path.join(process.cwd(), geodatadir.split('=')[1]);
+	if (!fs.existsSync(dataPath)) {
+		console.log(chalk.red('ERROR') + ': Directory does\'t exist: ' + dataPath);
+		process.exit(1);
+	}
+}
 var tmpPath = path.join(__dirname, '..', 'tmp');
 var countryLookup = {};
 var cityLookup = {};
