@@ -36,15 +36,15 @@ var geodatadir = args.find(function(arg) {
 if (typeof geodatadir === 'undefined' && typeof process.env.GEODATADIR !== 'undefined') {
 	geodatadir = 'geodatadir='+process.env.GEODATADIR;
 }
-var dataPath = path.join(__dirname, '..', 'data');
+var dataPath = path.resolve(__dirname, '..', 'data');
 if (typeof geodatadir !== 'undefined') {
-	dataPath = path.join(process.cwd(), geodatadir.split('=')[1]);
+	dataPath = path.resolve(process.cwd(), geodatadir.split('=')[1]);
 	if (!fs.existsSync(dataPath)) {
 		console.log(chalk.red('ERROR') + ': Directory does\'t exist: ' + dataPath);
 		process.exit(1);
 	}
 }
-var tmpPath = path.join(__dirname, '..', 'tmp');
+var tmpPath = path.resolve(__dirname, '..', 'tmp');
 var countryLookup = {};
 var cityLookup = {};
 var databases = [
