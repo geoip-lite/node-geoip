@@ -51,7 +51,9 @@ console.log(geo);
   city: 'San Antonio',
   ll: [ 29.4969, -98.4032 ],
   metro: 641,
-  area: 1000 }
+  area: 1000
+  postalCode: '04300' 
+}
 
 ```
 
