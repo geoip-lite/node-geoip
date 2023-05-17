@@ -528,7 +528,7 @@ function processCityData(src, dest, cb) {
 
 function processCityDataNames(src, dest, cb) {
 	var locId = null;
-	var linesCount = 0;
+	var linesCount = 1;
 	function processLine(line) {
 		if (line.match(/^Copyright/) || !line.match(/\d/)) {
 			return;
