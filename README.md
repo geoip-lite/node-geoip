@@ -5,7 +5,9 @@ A native NodeJS API for the GeoLite data from MaxMind.
 
 This product includes GeoLite data created by MaxMind, available from http://maxmind.com/
 
-[![Build Status](https://travis-ci.org/bluesmoon/node-geoip.svg?branch=master "node-geoip on Travis")](https://travis-ci.org/bluesmoon/node-geoip)
+**NOTE** You MUST update the data files after installation. The MaxMind license does not allow us to distribute
+the latest version of the data files with this package.  Follow the instructions under [update the datafiles](#2-update-the-datafiles-optional)
+for details.
 
 introduction
 ------------
