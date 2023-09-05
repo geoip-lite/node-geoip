@@ -184,7 +184,7 @@ function check(database, cb) {
 			if (status !== 200) {
 				console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 				client.abort();
-				process.exit();
+				process.exit(1);
 			}
     
 			var str = "";
@@ -207,7 +207,7 @@ function check(database, cb) {
 					console.log(chalk.red('ERROR') + ': Could not retrieve checksum for', database.type, chalk.red('Aborting'));
 					console.log('Run with "force" to update without checksum');
 					client.abort();
-					process.exit();
+					process.exit(1);
 				}
 				cb(null, database);
 			});
@@ -245,7 +245,7 @@ function fetch(database, cb) {
 		if (status !== 200) {
 			console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 			client.abort();
-			process.exit();
+			process.exit(1);
 		}
 
 		var tmpFilePipe;
