@@ -44,7 +44,7 @@ if (typeof geodatadir !== 'undefined') {
 		process.exit(1);
 	}
 }
-var tmpPath = path.resolve(__dirname, '..', 'tmp');
+var tmpPath = process.env.GEOTMPDIR ? process.env.GEOTMPDIR : path.resolve(__dirname, '..', 'tmp');
 var countryLookup = {};
 var cityLookup = {};
 var databases = [
