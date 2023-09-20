@@ -179,6 +179,18 @@ geoip.startWatchingDataUpdate();
 
 This tool can be used with `npm run-script updatedb` to periodically update geo data on a running server.
 
+#### Environment variables
+
+The following environment variables can be set.
+
+```bash
+# Override the default node_modules/geoip-lite/data dir
+GEOTMPDIR=/some/path
+
+# Override the default node_modules/geoip-lite/tmp dir
+GEODATADIR=/some/path
+```
+
 Caveats
 -------
 
