@@ -46,7 +46,7 @@ if (typeof geodatadir !== 'undefined') {
 }
 var tmpPath = process.env.GEOTMPDIR ? process.env.GEOTMPDIR : path.resolve(__dirname, '..', 'tmp');
 var countryLookup = {};
-var cityLookup = {};
+var cityLookup = {NaN: -1};
 var databases = [
 	{
 		type: 'country',
@@ -538,7 +538,7 @@ function processCityDataNames(src, dest, cb) {
 		var sz = 88;
 		var fields = CSVtoArray(line);
 		if (!fields) {
-			//lot's of cities contain ` or ' in the name and can't be parsed correctly with current method
+			//lots of cities contain ` or ' in the name and can't be parsed correctly with current method
 			console.log("weird line: %s::", line);
 			return;
 		}

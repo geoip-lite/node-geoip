@@ -67,7 +67,7 @@ installation
 
 Run `cd node_modules/geoip-lite && npm run-script updatedb license_key=YOUR_LICENSE_KEY` to update the data files. (Replace `YOUR_LICENSE_KEY` with your license key obtained from [maxmind.com](https://support.maxmind.com/hc/en-us/articles/4407111582235-Generate-a-License-Key))
 
-You can create maxmind account [here](https://www.maxmind.com/en/geolite2/signup)
+You can create a maxmind account [here](https://www.maxmind.com/en/geolite2/signup)
 
 **NOTE** that this requires a lot of RAM.  It is known to fail on on a Digital Ocean or AWS micro instance.
 There are no plans to change this.  `geoip-lite` stores all data in RAM in order to be fast.
