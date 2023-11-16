@@ -426,7 +426,7 @@ async function processCountryData(src, dest) {
 		await processLine(line);
 	}
 	datFile.close();
-	console.log(' DONE'.green);
+	console.log(chalk.green(' DONE'));
 }
 
 async function processCityData(src, dest) {
@@ -671,8 +671,11 @@ async.eachSeries(databases, function(database, nextDatabase) {
 		process.exit(1);
 	} else {
 		console.log(chalk.green('Successfully Updated Databases from MaxMind.'));
-		if (args.indexOf("debug") !== -1) console.log(chalk.yellow.bold('Notice: temporary files are not deleted for debug purposes.'));
-		else rimraf(tmpPath);
+		if (args.indexOf("debug") !== -1) {
+			console.log(chalk.yellow.bold('Notice: temporary files are not deleted for debug purposes.'));
+		} else {
+			rimraf(tmpPath);
+		}
 		process.exit(0);
 	}
 });
