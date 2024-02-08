@@ -181,8 +181,10 @@ function check(database, cb) {
         
 		function onResponse(response) {
 			var status = response.statusCode;
-    
-			if (status !== 200) {
+
+			if(status === 302 || status === 301){
+				return https.get(getHTTPOptions(response.headers.location), onResponse);
+			}else if (status !== 200) {
 				console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 				client.abort();
 				process.exit(1);
@@ -243,7 +245,9 @@ function fetch(database, cb) {
 	function onResponse(response) {
 		var status = response.statusCode;
 
-		if (status !== 200) {
+		if(status === 302 || status === 301){
+			return https.get(getHTTPOptions(response.headers.location), onResponse);
+		}else if (status !== 200) {
 			console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 			client.abort();
 			process.exit(1);
