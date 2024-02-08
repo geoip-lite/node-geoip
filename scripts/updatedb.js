@@ -184,7 +184,7 @@ function check(database, cb) {
 
 			if(status === 301 || status === 302 || status === 303 || status === 307 || status === 308) {
 				return https.get(getHTTPOptions(response.headers.location), onResponse);
-			}else if (status !== 200) {
+			} else if (status !== 200) {
 				console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 				client.abort();
 				process.exit(1);
@@ -247,7 +247,7 @@ function fetch(database, cb) {
 
 		if(status === 301 || status === 302 || status === 303 || status === 307 || status === 308) {
 			return https.get(getHTTPOptions(response.headers.location), onResponse);
-		}else if (status !== 200) {
+		} else if (status !== 200) {
 			console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 			client.abort();
 			process.exit(1);
