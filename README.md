@@ -234,7 +234,7 @@ References
 Copyright
 ---------
 
-`geoip-lite` is Copyright 2011-2018 Philip Tellis <philip@bluesmoon.info> and the latest version of the code is
+`geoip-lite` is Copyright Philip Tellis <philip@bluesmoon.info> and other contributors, and the latest version of the code is
 available at https://github.com/bluesmoon/node-geoip
 
 License
