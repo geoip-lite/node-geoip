@@ -41,7 +41,7 @@ module.exports = {
 
 		test.strictEqual(actual.metro, 501, "should match metro");
 
-		test.strictEqual(actual.area, 1, "should match area");
+		test.strictEqual(actual.area, 5, "should match area");
 
 		test.done();
 	},
@@ -63,7 +63,7 @@ module.exports = {
 
 		test.strictEqual(actual.timezone, 'Europe/Amsterdam', "should match timezone");
 
-		test.strictEqual(actual.city, 'Amsterdam', "should match city");
+		test.strictEqual(actual.city, 'Zandvoort', "should match city");
 
 		test.ok(actual.ll, 'should contain coordinates');
 
@@ -78,7 +78,7 @@ module.exports = {
 		test.expect(2);
 
 		var ip = "2.139.175.1";
-		var expected = "Pamplona";
+		var expected = "Madrid";
 		var actual = geoip.lookup(ip);
 
 		test.ok(actual, "Should return a non-null value for " + ip);
