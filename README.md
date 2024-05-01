@@ -69,7 +69,7 @@ Run `cd node_modules/geoip-lite && npm run-script updatedb license_key=YOUR_LICE
 
 You can create a maxmind account [here](https://www.maxmind.com/en/geolite2/signup)
 
-Maxmind also sells subscriptions to premium and more accurate data.  With a subscritpions the files can be updated with `series` option.  Run `cd node_modules/geoip-lite && npm run-script updatedb license_key=YOUR_LICENSE_KEY series=GeoIP2` to update the data files with the premium more accureate data sets.
+Maxmind also sells subscriptions to premium and more accurate data.  With a subscritpions the files can be updated with the `series` option.  With a license key with a premium subscription, run `cd node_modules/geoip-lite && npm run-script updatedb license_key=YOUR_LICENSE_KEY series=GeoIP2` to update the data files with the premium more accureate data sets.
 
 **NOTE** that this requires a lot of RAM.  It is known to fail on on a Digital Ocean or AWS micro instance.
 There are no plans to change this.  `geoip-lite` stores all data in RAM in order to be fast.
