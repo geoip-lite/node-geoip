@@ -1,0 +1,1 @@
+require('../lib/main.js');console.log(process.memoryUsage());
