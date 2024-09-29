@@ -180,7 +180,7 @@ npm run updatedb-force license_key=YOUR_LICENSE_KEY
 
 You can also run it by doing:
 ```shell
-node ./node_modules/geoip-lite2/scripts/updatedb.js license_key=YOUR_LICENSE_KEY
+node ./node_modules/geoip-lite2/utils/updatedb.js license_key=YOUR_LICENSE_KEY
 ```
 
 ### Ways to reload data in your app when update finished

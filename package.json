@@ -1,6 +1,6 @@
 {
   "name": "geoip-lite2",
-  "version": "2.1.42",
+  "version": "2.1.43",
   "description": "A light weight native JavaScript implementation of GeoIP API from MaxMind. Improved and faster version by Sefinek.",
   "keywords": [
     "city",
@@ -64,8 +64,7 @@
     "up": "ncu -u && npm install && npm update && npm audit fix",
     "updatedb": "node utils/updatedb.js",
     "updatedb-debug": "node utils/updatedb.js debug",
-    "updatedb-force": "node utils/updatedb.js force",
-    "version": "node test/version.js"
+    "updatedb-force": "node utils/updatedb.js force"
   },
   "dependencies": {
     "adm-zip": "^0.5.16",
@@ -75,10 +74,10 @@
     "rimraf": "^6.0.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.10.0",
+    "@eslint/js": "^9.11.1",
     "globals": "^15.9.0",
     "jest": "^29.7.0",
-    "terser": "^5.32.0"
+    "terser": "^5.34.1"
   },
   "engines": {
     "node": ">=10.3.0"
