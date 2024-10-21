@@ -9,7 +9,7 @@ export default [
 			ecmaVersion: 2024,
 			globals: {
 				...globals.node,
-				...globals.es2021
+				...globals.es2024
 			}
 		},
 		rules: {
@@ -51,6 +51,6 @@ export default [
 			'wrap-regex': 'error',
 			'yoda': 'error'
 		},
-		ignores: ['node_modules', 'lib/*', 'test/*', 'utils/*']
+		ignores: ['node_modules', 'lib-minified/*', 'utils-minified/*']
 	}
 ];
