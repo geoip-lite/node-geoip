@@ -1,1 +1,6 @@
-const e=require('../lib/main.js'),n=e.pretty(34525252);console.log(`Module version: ${e.version}\nIP: 34525252\nPretty: ${n}`);
+const geoIp2 = require('../lib/main.js');
+
+const ip = 34525252;
+const addr = geoIp2.pretty(ip);
+
+console.log(`Module version: ${geoIp2.version}\nIP: ${34525252}\nPretty: ${addr}`);

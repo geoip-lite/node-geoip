@@ -38,4 +38,3 @@ function MinifyJSFiles {
 
 MinifyJSFiles -SourceDirectory ".\lib-unminified" -OutputDirectory ".\lib"
 MinifyJSFiles -SourceDirectory ".\utils-unminified" -OutputDirectory ".\utils"
-MinifyJSFiles -SourceDirectory ".\test-unminified" -OutputDirectory ".\test"

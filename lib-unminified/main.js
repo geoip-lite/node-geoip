@@ -54,8 +54,8 @@ const RECORD_SIZE6 = 34;
 
 const lookup4 = ip => {
 	let fline = 0;
-	let floor = cache4.lastIP;
 	let cline = cache4.lastLine;
+	let floor = cache4.lastIP;
 	let ceil = cache4.firstIP;
 	let line, locId;
 
@@ -70,21 +70,22 @@ const lookup4 = ip => {
 		country: '',
 		region: '',
 		eu: '',
-		timezone:'',
+		timezone: '',
 		city: '',
-		ll: [null, null]
+		ll: [null, null],
+		metro: null,
+		area: null
 	};
 
 	// Outside IPv4 range
 	if (ip > cache4.lastIP || ip < cache4.firstIP) return null;
 
 	// Private IP
-	let i;
-	for (i = 0; i < privateRange.length; i++) {
+	for (let i = 0; i < privateRange.length; i++) {
 		if (ip >= privateRange[i][0] && ip <= privateRange[i][1]) return null;
 	}
 
-	do {
+	while (true) {
 		line = Math.round((cline - fline) / 2) + fline;
 		floor = buffer.readUInt32BE(line * recordSize);
 		ceil = buffer.readUInt32BE((line * recordSize) + 4);
@@ -102,9 +103,9 @@ const lookup4 = ip => {
 					geoData.country = locBuffer.toString('utf8', (locId * locRecordSize), (locId * locRecordSize) + 2).replace(/\u0000.*/, '');
 					geoData.region = locBuffer.toString('utf8', (locId * locRecordSize) + 2, (locId * locRecordSize) + 5).replace(/\u0000.*/, '');
 					geoData.metro = locBuffer.readInt32BE((locId * locRecordSize) + 5);
-					geoData.ll[0] = buffer.readInt32BE((line * recordSize) + 12) / 10000;// latitude
+					geoData.ll[0] = buffer.readInt32BE((line * recordSize) + 12) / 10000; // latitude
 					geoData.ll[1] = buffer.readInt32BE((line * recordSize) + 16) / 10000; // longitude
-					geoData.area = buffer.readUInt32BE((line * recordSize) + 20); // longitude
+					geoData.area = buffer.readUInt32BE((line * recordSize) + 20);
 					geoData.eu = locBuffer.toString('utf8', (locId * locRecordSize) + 9, (locId * locRecordSize) + 10).replace(/\u0000.*/, '');
 					geoData.timezone = locBuffer.toString('utf8', (locId * locRecordSize) + 10, (locId * locRecordSize) + 42).replace(/\u0000.*/, '');
 					geoData.city = locBuffer.toString('utf8', (locId * locRecordSize) + 42, (locId * locRecordSize) + locRecordSize).replace(/\u0000.*/, '');
@@ -125,7 +126,7 @@ const lookup4 = ip => {
 		} else if (ceil < ip) {
 			fline = line;
 		}
-	} while (1);
+	}
 };
 
 const lookup6 = ip => {
@@ -134,15 +135,13 @@ const lookup6 = ip => {
 	const locBuffer = cache4.locationBuffer;
 	const locRecordSize = cache4.locationRecordSize;
 
-	const geoData = { range: [null, null], country: '', region: '', city: '', ll: [0, 0] };
+	const geoData = { range: [null, null], country: '', region: '', city: '', ll: [0, 0], metro: null, area: null, eu: '', timezone: '' };
+
 	const readIp = (line, offset) => {
-		let ii;
 		const ipArray = [];
-
-		for (ii = 0; ii < 2; ii++) {
-			ipArray.push(buffer.readUInt32BE((line * recordSize) + (offset * 16) + (ii * 4)));
+		for (let i = 0; i < 2; i++) {
+			ipArray.push(buffer.readUInt32BE((line * recordSize) + (offset * 16) + (i * 4)));
 		}
-
 		return ipArray;
 	};
 
@@ -150,14 +149,14 @@ const lookup6 = ip => {
 	cache6.firstIP = readIp(0, 0);
 
 	let fline = 0;
-	let floor = cache6.lastIP;
 	let cline = cache6.lastLine;
+	let floor = cache6.lastIP;
 	let ceil = cache6.firstIP;
 	let line, locId;
 
 	if (cmp6(ip, cache6.lastIP) > 0 || cmp6(ip, cache6.firstIP) < 0) return null;
 
-	do {
+	while (true) {
 		line = Math.round((cline - fline) / 2) + fline;
 		floor = readIp(line, 0);
 		ceil = readIp(line, 1);
@@ -173,7 +172,7 @@ const lookup6 = ip => {
 					geoData.country = locBuffer.toString('utf8', (locId * locRecordSize), (locId * locRecordSize) + 2).replace(/\u0000.*/, '');
 					geoData.region = locBuffer.toString('utf8', (locId * locRecordSize) + 2, (locId * locRecordSize) + 5).replace(/\u0000.*/, '');
 					geoData.metro = locBuffer.readInt32BE((locId * locRecordSize) + 5);
-					geoData.ll[0] = buffer.readInt32BE((line * recordSize) + 36) / 10000;// latitude
+					geoData.ll[0] = buffer.readInt32BE((line * recordSize) + 36) / 10000; // latitude
 					geoData.ll[1] = buffer.readInt32BE((line * recordSize) + 40) / 10000; // longitude
 					geoData.area = buffer.readUInt32BE((line * recordSize) + 44); // area
 					geoData.eu = locBuffer.toString('utf8', (locId * locRecordSize) + 9, (locId * locRecordSize) + 10).replace(/\u0000.*/, '');
@@ -196,7 +195,7 @@ const lookup6 = ip => {
 		} else if (cmp6(ceil, ip) < 0) {
 			fline = line;
 		}
-	} while (1);
+	}
 };
 
 const v6prefixes = ['0:0:0:0:0:FFFF:', '::FFFF:'];

@@ -1,1 +1,7 @@
-const o=require('../lib/main.js'),l=o.lookup('109.199.64.0'),c=o.lookup('2001:470:1:c84::111');console.log(l),console.log(c);
+const geoIp2 = require('../lib/main.js');
+
+const ipv4 = geoIp2.lookup('109.199.64.0');
+console.log(ipv4);
+
+const ipv6 = geoIp2.lookup('2001:470:1:c84::111');
+console.log(ipv6);

@@ -32,4 +32,3 @@ function MinifyJSFiles {
 
 MinifyJSFiles "./lib-unminified" "./lib"
 MinifyJSFiles "./utils-unminified" "./utils"
-MinifyJSFiles "./test-unminified" "./test"
