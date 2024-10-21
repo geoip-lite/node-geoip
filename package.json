@@ -56,7 +56,7 @@
   "license": "Apache-2.0",
   "author": "Philip Tellis <philip@bluesmoon.info> (https://bluesmoon.info)",
   "main": "lib-minified/main.js",
-  "typings": "index.d.ts",
+  "types": "index.d.ts",
   "scripts": {
     "up": "ncu -u && npm install && npm update && npm audit fix",
     "minify": "node minify.js",
