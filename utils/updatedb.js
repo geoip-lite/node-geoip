@@ -1,1 +1,612 @@
-'use strict';const{name:e,version:t}=require('../package.json'),n=`Mozilla/5.0 (compatible; ${e}/${t}; +https://github.com/sefinek24/geoip-lite2)`,o=require('fs'),r=require('http'),s=require('https'),i=require('path'),c=require('zlib'),a=require('readline');o.existsSync=o.existsSync||i.existsSync;const l=require('async'),{decodeStream:u}=require('iconv-lite'),d=require('rimraf').sync,p=require('adm-zip'),f=require('../lib/utils.js'),{Address6:g,Address4:h}=require('ip-address'),w=process.argv.slice(2);let m=w.find((e=>null!==e.match(/^license_key=[a-zA-Z0-9]+/)));void 0===m&&void 0!==process.env.LICENSE_KEY&&(m=`license_key=${process.env.LICENSE_KEY}`);let y=w.find((e=>null!==e.match(/^geoDataDir=[\w./]+/)));void 0===y&&void 0!==process.env.GEODATADIR&&(y=`geoDataDir=${process.env.GEODATADIR}`);let I=i.resolve(__dirname,'..','data');void 0!==y&&(I=i.resolve(process.cwd(),y.split('=')[1]),o.existsSync(I)||(console.log('ERROR: Directory doesn\'t exist: '+I),process.exit(1)));const S=process.env.GEOTMPDIR?process.env.GEOTMPDIR:i.resolve(__dirname,'..','tmp'),v={},E={NaN:-1},x=[{type:'country',url:`https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip&${m}`,checksum:`https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip.sha256&${m}`,fileName:'GeoLite2-Country-CSV.zip',src:['GeoLite2-Country-Locations-en.csv','GeoLite2-Country-Blocks-IPv4.csv','GeoLite2-Country-Blocks-IPv6.csv'],dest:['','geoip-country.dat','geoip-country6.dat']},{type:'city',url:`https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip&${m}`,checksum:`https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip.sha256&${m}`,fileName:'GeoLite2-City-CSV.zip',src:['GeoLite2-City-Locations-en.csv','GeoLite2-City-Blocks-IPv4.csv','GeoLite2-City-Blocks-IPv6.csv'],dest:['geoip-city-names.dat','geoip-city.dat','geoip-city6.dat']}];function k(e){const t=i.dirname(e);o.existsSync(t)||o.mkdirSync(t)}const D=/^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/,C=/(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;function R(e){if(!D.test(e)&&(e=function(e){let t=0,n=-1;for(e=e.replace(/""/,'\\"').replace(/'/g,'\\\'');t<e.length&&n<e.length;)t=n,n=e.indexOf(',',t+1),n<0&&(n=e.length),e.indexOf('\'',t||0)>-1&&e.indexOf('\'',t)<n&&'"'!=e[t+1]&&'"'!=e[n-1]&&(n=(e=e.substr(0,t+1)+'"'+e.substr(t+1,n-t-1)+'"'+e.substr(n,e.length-n)).indexOf(',',n+1),n<0&&(n=e.length));return e}(e),!D.test(e)))return null;const t=[];return e.replace(C,((e,n,o,r)=>(void 0!==n?t.push(n.replace(/\\'/g,'\'')):void 0!==o?t.push(o.replace(/\\"/g,'"').replace(/\\'/g,'\'')):void 0!==r&&t.push(r),''))),/,\s*$/.test(e)&&t.push(''),t}function B(e){const t=new URL(e),o={protocol:t.protocol,host:t.host,path:t.pathname+t.search,headers:{'User-Agent':n}};if(process.env.http_proxy||process.env.https_proxy)try{const e=require('https-proxy-agent');o.agent=new e(process.env.http_proxy||process.env.https_proxy)}catch(e){console.error(`Install https-proxy-agent to use an HTTP/HTTPS proxy. ${e.message}`),process.exit(-1)}return o}function _(e,t){if(-1!==w.indexOf('force'))return t(null,e);const n=e.checksum;if(void 0===n)return t(null,e);o.readFile(i.join(I,`${e.type}.checksum`),{encoding:'utf8'},((o,i)=>{!o&&i&&i.length&&(e.checkValue=i),console.log('Checking',e.fileName);var c=s.get(B(n),(function n(o){const i=o.statusCode;if([301,302,303,307,308].includes(i))return s.get(B(o.headers.location),n);200!==i&&(console.error(o.data),console.error('ERROR: HTTP Request Failed [%d %s]',i,r.STATUS_CODES[i]),c.end(),process.exit(1));let a='';o.on('data',(e=>{a+=e})),o.on('end',(()=>{a&&a.length?a===e.checkValue?(console.log(`Database "${e.type}" is up to date`),e.skip=!0):(console.log(`Database "${e.type}" has new data`),e.checkValue=a):(console.error(`ERROR: Could not retrieve checksum for ${e.type}. Aborting.`),console.error('Run with "force" to update without checksum'),c.end(),process.exit(1)),t(null,e)}))}))}))}function b(e,t){if(e.skip)return t(null,null,null,e);const n=e.url;let a=e.fileName;const l='.gz'===i.extname(a);l&&(a=a.replace('.gz',''));const u=i.join(S,a);if(o.existsSync(u))return t(null,u,a,e);console.log('Fetching',a),k(u);var d=s.get(B(n),(function n(i){const p=i.statusCode;if([301,302,303,307,308].includes(p))return s.get(B(i.headers.location),n);let f;200!==p&&(console.error('ERROR: HTTP Request Failed [%d %s]',p,r.STATUS_CODES[p]),d.end(),process.exit(1));const g=o.createWriteStream(u);f=l?i.pipe(c.createGunzip()).pipe(g):i.pipe(g),f.on('close',(()=>{console.log(' DONE'),t(null,u,a,e)}))}));process.stdout.write(`Retrieving ${a}...`)}function O(e,t,n,r){if(n.skip)return r(null,n);if('.zip'!==i.extname(t))r(null,n);else{process.stdout.write('Extracting '+t+'...');new p(e).getEntries().forEach((e=>{if(e.isDirectory)return;const t=e.entryName.split('/'),n=t[t.length-1],r=i.join(S,n);o.writeFileSync(r,e.getData())})),console.log(' DONE'),r(null,n)}}function A(e,t){const n=i.join(S,e);process.stdout.write('Processing lookup data (may take a moment)...');const r=a.createInterface({input:o.createReadStream(n).pipe(u('latin1')),output:process.stdout,terminal:!1});let s=0;r.on('line',(e=>{s>0&&function(e){const t=R(e);!t||t.length<6?console.log('Weird line: %s::',e):v[t[0]]=t[4]}(e),s++})),r.on('close',(()=>{console.log(' DONE'),t()}))}async function $(e,t){let n=0;function r(e){const t=R(e);if(!t||t.length<6)return console.warn('weird line: %s::',e);let o,r,s;n++;const i=v[t[1]];let c,a,d;if(i){if(t[0].match(/:/)){for(a=34,s=new g(t[0]),o=f.aton6(s.startAddress().correctForm()),r=f.aton6(s.endAddress().correctForm()),c=Buffer.alloc(a),d=0;d<o.length;d++)c.writeUInt32BE(o[d],4*d);for(d=0;d<r.length;d++)c.writeUInt32BE(r[d],16+4*d)}else a=10,s=new h(t[0]),o=parseInt(s.startAddress().bigInt(),10),r=parseInt(s.endAddress().bigInt(),10),c=Buffer.alloc(a),c.fill(0),c.writeUInt32BE(o,0),c.writeUInt32BE(r,4);return c.write(i,a-2),Date.now()-l>5e3&&(l=Date.now(),process.stdout.write(`\nStill working (${n})...`)),u._writableState.needDrain?new Promise((e=>{u.write(c,e)})):u.write(c)}}const s=i.join(I,t),c=i.join(S,e);d(s),k(s),process.stdout.write('\nProcessing data (may take a moment)...');var l=Date.now(),u=o.createWriteStream(s);const p=a.createInterface({input:o.createReadStream(c),crlfDelay:1/0});let w=0;for await(const e of p)w++,1!==w&&await r(e);u.close(),console.log(' DONE')}async function q(e,t){let n=0;async function r(e){if(e.match(/^Copyright/)||!e.match(/\d/))return;const t=R(e);if(!t)return console.warn('Weird line: %s::',e);let o,r,s,i,c,a,d,p,w,m;if(n++,t[0].match(/:/)){let e=0;for(a=48,s=new g(t[0]),o=f.aton6(s.startAddress().correctForm()),r=f.aton6(s.endAddress().correctForm()),i=parseInt(t[1],10),i=E[i],c=Buffer.alloc(a),c.fill(0),m=0;m<o.length;m++)c.writeUInt32BE(o[m],e),e+=4;for(m=0;m<r.length;m++)c.writeUInt32BE(r[m],e),e+=4;c.writeUInt32BE(i>>>0,32),d=Math.round(1e4*parseFloat(t[7])),p=Math.round(1e4*parseFloat(t[8])),w=parseInt(t[9],10),c.writeInt32BE(d,36),c.writeInt32BE(p,40),c.writeInt32BE(w,44)}else a=24,s=new h(t[0]),o=parseInt(s.startAddress().bigInt(),10),r=parseInt(s.endAddress().bigInt(),10),i=parseInt(t[1],10),i=E[i],c=Buffer.alloc(a),c.fill(0),c.writeUInt32BE(o>>>0,0),c.writeUInt32BE(r>>>0,4),c.writeUInt32BE(i>>>0,8),d=Math.round(1e4*parseFloat(t[7])),p=Math.round(1e4*parseFloat(t[8])),w=parseInt(t[9],10),c.writeInt32BE(d,12),c.writeInt32BE(p,16),c.writeInt32BE(w,20);return Date.now()-l>5e3&&(l=Date.now(),process.stdout.write('\nStill working ('+n+')...')),u._writableState.needDrain?new Promise((e=>{u.write(c,e)})):u.write(c)}const s=i.join(I,t),c=i.join(S,e);d(s),process.stdout.write('\nProcessing data (may take a moment)...');var l=Date.now(),u=o.createWriteStream(s);const p=a.createInterface({input:o.createReadStream(c),crlfDelay:1/0});let w=0;for await(const e of p)w++,1!==w&&await r(e);u.close()}function G(e,t,n){let r=null,s=0;const c=i.join(I,t),l=i.join(S,e);d(c);var p=o.openSync(c,'w');const f=a.createInterface({input:o.createReadStream(l).pipe(u('utf-8')),output:process.stdout,terminal:!1});let g=0;f.on('line',(e=>{g>0&&function(e){if(e.match(/^Copyright/)||!e.match(/\d/))return;const t=Buffer.alloc(88),n=R(e);if(!n)return void console.warn('Weird line: %s::',e);r=parseInt(n[0]),E[r]=s;const i=n[4],c=n[6],a=n[10],l=parseInt(n[11]),u=n[12],d=n[13];t.fill(0),t.write(i,0),t.write(c,2),l&&t.writeInt32BE(l,5),t.write(d,9),t.write(u,10),t.write(a,42),o.writeSync(p,t,0,t.length,null),s++}(e),g++})),f.on('close',n)}function L(e,t){if(e.skip)return t(null,e);const n=e.type,o=e.src,r=e.dest;'country'===n?Array.isArray(o)?A(o[0],(()=>{$(o[1],r[1]).then((()=>$(o[2],r[2]))).then((()=>{t(null,e)}))})):$(o,r):'city'===n&&G(o[0],r[0],(()=>{q(o[1],r[1]).then((()=>(console.log('\nCity data processed'),q(o[2],r[2])))).then((()=>{console.log(' DONE'),t(null,e)}))}))}function F(e,t){if(e.skip||!e.checkValue)return t();o.writeFile(i.join(I,e.type+'.checksum'),e.checkValue,'utf8',(n=>{n&&console.log('Failed to Update checksums! Database:',e.type),t()}))}m||(console.error('ERROR: Missing license_key'),process.exit(1)),d(S),k(S),l.eachSeries(x,((e,t)=>{l.seq(_,b,O,L,F)(e,t)}),(e=>{e?(console.error('Failed to update databases from MaxMind!',e),process.exit(1)):(console.log('Successfully updated databases from MaxMind'),-1!==w.indexOf('debug')?console.debug('Notice: temporary files are not deleted for debug purposes'):d(S),process.exit(0))}));
+// Fetches and converts MaxMind lite databases
+
+'use strict';
+
+const { name, version } = require('../package.json');
+const UserAgent = `Mozilla/5.0 (compatible; ${name}/${version}; +https://github.com/sefinek24/geoip-lite2)`;
+
+const fs = require('fs');
+const http = require('http');
+const https = require('https');
+const path = require('path');
+const zlib = require('zlib');
+const readline = require('readline');
+
+fs.existsSync = fs.existsSync || path.existsSync;
+
+const async = require('async');
+const { decodeStream } = require('iconv-lite');
+const rimraf = require('rimraf').sync;
+const AdmZip = require('adm-zip');
+const utils = require('../lib/utils.js');
+const { Address6, Address4 } = require('ip-address');
+
+const args = process.argv.slice(2);
+let license_key = args.find(arg => {
+	return arg.match(/^license_key=[a-zA-Z0-9]+/) !== null;
+});
+if (typeof license_key === 'undefined' && typeof process.env.LICENSE_KEY !== 'undefined') {
+	license_key = `license_key=${process.env.LICENSE_KEY}`;
+}
+let geoDataDir = args.find(arg => {
+	return arg.match(/^geoDataDir=[\w./]+/) !== null;
+});
+if (typeof geoDataDir === 'undefined' && typeof process.env.GEODATADIR !== 'undefined') {
+	geoDataDir = `geoDataDir=${process.env.GEODATADIR}`;
+}
+let dataPath = path.resolve(__dirname, '..', 'data');
+if (typeof geoDataDir !== 'undefined') {
+	dataPath = path.resolve(process.cwd(), geoDataDir.split('=')[1]);
+	if (!fs.existsSync(dataPath)) {
+		console.log('ERROR: Directory doesn\'t exist: ' + dataPath);
+		process.exit(1);
+	}
+}
+const tmpPath = process.env.GEOTMPDIR ? process.env.GEOTMPDIR : path.resolve(__dirname, '..', 'tmp');
+const countryLookup = {};
+const cityLookup = { NaN: -1 };
+const databases = [{
+	type: 'country',
+	url: `https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip&${license_key}`,
+	checksum: `https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip.sha256&${license_key}`,
+	fileName: 'GeoLite2-Country-CSV.zip',
+	src: [
+		'GeoLite2-Country-Locations-en.csv',
+		'GeoLite2-Country-Blocks-IPv4.csv',
+		'GeoLite2-Country-Blocks-IPv6.csv'
+	],
+	dest: ['', 'geoip-country.dat', 'geoip-country6.dat']
+},
+{
+	type: 'city',
+	url: `https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip&${license_key}`,
+	checksum: `https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip.sha256&${license_key}`,
+	fileName: 'GeoLite2-City-CSV.zip',
+	src: [
+		'GeoLite2-City-Locations-en.csv',
+		'GeoLite2-City-Blocks-IPv4.csv',
+		'GeoLite2-City-Blocks-IPv6.csv'
+	],
+	dest: ['geoip-city-names.dat', 'geoip-city.dat', 'geoip-city6.dat']
+}];
+
+function mkdir(dirName) {
+	const dir = path.dirname(dirName);
+	if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+}
+
+// Ref: http://stackoverflow.com/questions/8493195/how-can-i-parse-a-csv-string-with-javascript
+// Return array of string values, or NULL if CSV string not well-formed.
+
+function tryFixingLine(line) {
+	let pos1 = 0;
+	let pos2 = -1;
+	// Escape quotes
+	line = line.replace(/""/, '\\"').replace(/'/g, '\\\'');
+
+	while (pos1 < line.length && pos2 < line.length) {
+		pos1 = pos2;
+		pos2 = line.indexOf(',', pos1 + 1);
+		if (pos2 < 0) pos2 = line.length;
+		if (line.indexOf('\'', (pos1 || 0)) > -1 && line.indexOf('\'', pos1) < pos2 && line[pos1 + 1] != '"' && line[pos2 - 1] != '"') {
+			line = line.substr(0, pos1 + 1) + '"' + line.substr(pos1 + 1, pos2 - pos1 - 1) + '"' + line.substr(pos2, line.length - pos2);
+			pos2 = line.indexOf(',', pos2 + 1);
+			if (pos2 < 0) pos2 = line.length;
+		}
+	}
+	return line;
+}
+
+const re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
+const re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
+
+function CSVtoArray(text) {
+	// Return NULL if input string is not well-formed CSV string.
+	if (!re_valid.test(text)) {
+		text = tryFixingLine(text);
+		if (!re_valid.test(text)) return null;
+	}
+	const a = []; // Initialize array to receive values.
+	text.replace(re_value, // "Walk" the string using replace with callback.
+		(m0, m1, m2, m3) => {
+			// Remove backslash from \' in single quoted values.
+			if (m1 !== undefined) a.push(m1.replace(/\\'/g, '\''));
+			// Remove backslash from \" in double-quoted values.
+			else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"').replace(/\\'/g, '\''));
+			else if (m3 !== undefined) a.push(m3);
+			return ''; // Return empty string.
+		});
+	// Handle special case of empty last value.
+	if ((/,\s*$/).test(text)) a.push('');
+	return a;
+}
+
+function getHTTPOptions(downloadUrl) {
+	const parsedUrl = new URL(downloadUrl);
+	const options = {
+		protocol: parsedUrl.protocol,
+		host: parsedUrl.host,
+		path: parsedUrl.pathname + parsedUrl.search,
+		headers: { 'User-Agent': UserAgent }
+	};
+
+	if (process.env.http_proxy || process.env.https_proxy) {
+		try {
+			const HttpsProxyAgent = require('https-proxy-agent');
+			options.agent = new HttpsProxyAgent(process.env.http_proxy || process.env.https_proxy);
+		} catch (err) {
+			console.error(`Install https-proxy-agent to use an HTTP/HTTPS proxy. ${err.message}`);
+			process.exit(-1);
+		}
+	}
+
+	return options;
+}
+
+function check(database, cb) {
+	if (args.indexOf('force') !== -1) {
+		// We are forcing database upgrade,
+		// So not even using checksums
+		return cb(null, database);
+	}
+
+	const checksumUrl = database.checksum;
+	if (typeof checksumUrl === 'undefined') return cb(null, database); // No checksum url to check, skipping
+
+	// Read existing checksum file
+	fs.readFile(path.join(dataPath, `${database.type}.checksum`), { encoding: 'utf8' }, (err, data) => {
+		if (!err && data && data.length) database.checkValue = data;
+
+		console.log('Checking', database.fileName);
+
+		function onResponse(response) {
+			const status = response.statusCode;
+			if ([301, 302, 303, 307, 308].includes(status)) {
+				return https.get(getHTTPOptions(response.headers.location), onResponse);
+			} else if (status !== 200) {
+				console.error(response.data);
+				console.error('ERROR: HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
+				client.end();
+				process.exit(1);
+			}
+
+			let str = '';
+			response.on('data', chunk => {
+				str += chunk;
+			});
+
+			response.on('end', () => {
+				if (str && str.length) {
+					if (str === database.checkValue) {
+						console.log(`Database "${database.type}" is up to date`);
+						database.skip = true;
+					} else {
+						console.log(`Database "${database.type}" has new data`);
+						database.checkValue = str;
+					}
+				}
+				else {
+					console.error(`ERROR: Could not retrieve checksum for ${database.type}. Aborting.`);
+					console.error('Run with "force" to update without checksum');
+					client.end();
+					process.exit(1);
+				}
+				cb(null, database);
+			});
+		}
+
+		var client = https.get(getHTTPOptions(checksumUrl), onResponse);
+	});
+}
+
+function fetch(database, cb) {
+	if (database.skip) return cb(null, null, null, database);
+
+	const downloadUrl = database.url;
+	let fileName = database.fileName;
+	const gzip = path.extname(fileName) === '.gz';
+	if (gzip) fileName = fileName.replace('.gz', '');
+
+	const tmpFile = path.join(tmpPath, fileName);
+	if (fs.existsSync(tmpFile)) return cb(null, tmpFile, fileName, database);
+
+	console.log('Fetching', fileName);
+
+	function onResponse(response) {
+		const status = response.statusCode;
+		if ([301, 302, 303, 307, 308].includes(status)) {
+			return https.get(getHTTPOptions(response.headers.location), onResponse);
+		} else if (status !== 200) {
+			console.error('ERROR: HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
+			client.end();
+			process.exit(1);
+		}
+
+		let tmpFilePipe;
+		const tmpFileStream = fs.createWriteStream(tmpFile);
+
+		if (gzip) {
+			tmpFilePipe = response.pipe(zlib.createGunzip()).pipe(tmpFileStream);
+		} else {
+			tmpFilePipe = response.pipe(tmpFileStream);
+		}
+
+		tmpFilePipe.on('close', () => {
+			console.log(' DONE');
+			cb(null, tmpFile, fileName, database);
+		});
+	}
+
+	mkdir(tmpFile);
+
+	var client = https.get(getHTTPOptions(downloadUrl), onResponse);
+
+	process.stdout.write(`Retrieving ${fileName}...`);
+}
+
+function extract(tmpFile, tmpFileName, database, cb) {
+	if (database.skip) return cb(null, database);
+
+	if (path.extname(tmpFileName) !== '.zip') {
+		cb(null, database);
+	} else {
+		process.stdout.write('Extracting ' + tmpFileName + '...');
+		const zip = new AdmZip(tmpFile);
+		const zipEntries = zip.getEntries();
+
+		zipEntries.forEach((entry) => {
+			if (entry.isDirectory) return; // Skip directory entries
+
+			const filePath = entry.entryName.split('/');
+			const fileName = filePath[filePath.length - 1];
+			const destinationPath = path.join(tmpPath, fileName);
+
+			fs.writeFileSync(destinationPath, entry.getData());
+		});
+
+		console.log(' DONE');
+		cb(null, database);
+	}
+}
+
+function processLookupCountry(src, cb) {
+	function processLine(line) {
+		const fields = CSVtoArray(line);
+		if (!fields || fields.length < 6) {
+			console.log('Weird line: %s::', line);
+			return;
+		}
+		countryLookup[fields[0]] = fields[4];
+	}
+	const tmpDataFile = path.join(tmpPath, src);
+
+	process.stdout.write('Processing lookup data (may take a moment)...');
+
+	const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile).pipe(decodeStream('latin1')), output: process.stdout, terminal: false });
+
+	let lineCount = 0;
+	rl.on('line', line => {
+		if (lineCount > 0) processLine(line);
+		lineCount++;
+	});
+
+	rl.on('close', () => {
+		console.log(' DONE');
+		cb();
+	});
+}
+
+async function processCountryData(src, dest) {
+	let lines = 0;
+	function processLine(line) {
+		const fields = CSVtoArray(line);
+		if (!fields || fields.length < 6) return console.warn('weird line: %s::', line);
+
+		lines++;
+
+		let sip;
+		let eip;
+		let rngip;
+		const cc = countryLookup[fields[1]];
+		let b;
+		let bsz;
+		let i;
+		if (cc) {
+			if (fields[0].match(/:/)) {
+				// IPv6
+				bsz = 34;
+				rngip = new Address6(fields[0]);
+				sip = utils.aton6(rngip.startAddress().correctForm());
+				eip = utils.aton6(rngip.endAddress().correctForm());
+
+				b = Buffer.alloc(bsz);
+				for (i = 0; i < sip.length; i++) {
+					b.writeUInt32BE(sip[i], i * 4);
+				}
+
+				for (i = 0; i < eip.length; i++) {
+					b.writeUInt32BE(eip[i], 16 + (i * 4));
+				}
+			} else {
+				// IPv4
+				bsz = 10;
+
+				rngip = new Address4(fields[0]);
+				sip = parseInt(rngip.startAddress().bigInt(), 10);
+				eip = parseInt(rngip.endAddress().bigInt(), 10);
+
+				b = Buffer.alloc(bsz);
+				b.fill(0);
+				b.writeUInt32BE(sip, 0);
+				b.writeUInt32BE(eip, 4);
+			}
+
+			b.write(cc, bsz - 2);
+			if (Date.now() - tstart > 5000) {
+				tstart = Date.now();
+				process.stdout.write(`\nStill working (${lines})...`);
+			}
+
+			if (datFile._writableState.needDrain) {
+				return new Promise(resolve => {
+					datFile.write(b, resolve);
+				});
+			} else {
+				return datFile.write(b);
+			}
+		}
+	}
+
+	const dataFile = path.join(dataPath, dest);
+	const tmpDataFile = path.join(tmpPath, src);
+
+	rimraf(dataFile);
+	mkdir(dataFile);
+
+	process.stdout.write('\nProcessing data (may take a moment)...');
+	var tstart = Date.now();
+	var datFile = fs.createWriteStream(dataFile);
+
+	const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile), crlfDelay: Infinity });
+	let i = 0;
+	for await (const line of rl) {
+		i++;
+		if (i === 1) continue;
+		await processLine(line);
+	}
+	datFile.close();
+	console.log(' DONE');
+}
+
+async function processCityData(src, dest) {
+	let lines = 0;
+	async function processLine(line) {
+		if (line.match(/^Copyright/) || !line.match(/\d/)) return;
+
+		const fields = CSVtoArray(line);
+		if (!fields) return console.warn('Weird line: %s::', line);
+		let sip;
+		let eip;
+		let rngip;
+		let locId;
+		let b;
+		let bsz;
+		let lat;
+		let lon;
+		let area;
+
+		let i;
+
+		lines++;
+
+		if (fields[0].match(/:/)) {
+			// IPv6
+			let offset = 0;
+			bsz = 48;
+			rngip = new Address6(fields[0]);
+			sip = utils.aton6(rngip.startAddress().correctForm());
+			eip = utils.aton6(rngip.endAddress().correctForm());
+			locId = parseInt(fields[1], 10);
+			locId = cityLookup[locId];
+
+			b = Buffer.alloc(bsz);
+			b.fill(0);
+
+			for (i = 0; i < sip.length; i++) {
+				b.writeUInt32BE(sip[i], offset);
+				offset += 4;
+			}
+
+			for (i = 0; i < eip.length; i++) {
+				b.writeUInt32BE(eip[i], offset);
+				offset += 4;
+			}
+			b.writeUInt32BE(locId >>> 0, 32);
+
+			lat = Math.round(parseFloat(fields[7]) * 10000);
+			lon = Math.round(parseFloat(fields[8]) * 10000);
+			area = parseInt(fields[9], 10);
+			b.writeInt32BE(lat, 36);
+			b.writeInt32BE(lon, 40);
+			b.writeInt32BE(area, 44);
+		} else {
+			// IPv4
+			bsz = 24;
+
+			rngip = new Address4(fields[0]);
+			sip = parseInt(rngip.startAddress().bigInt(), 10);
+			eip = parseInt(rngip.endAddress().bigInt(), 10);
+			locId = parseInt(fields[1], 10);
+			locId = cityLookup[locId];
+			b = Buffer.alloc(bsz);
+			b.fill(0);
+			b.writeUInt32BE(sip >>> 0, 0);
+			b.writeUInt32BE(eip >>> 0, 4);
+			b.writeUInt32BE(locId >>> 0, 8);
+
+			lat = Math.round(parseFloat(fields[7]) * 10000);
+			lon = Math.round(parseFloat(fields[8]) * 10000);
+			area = parseInt(fields[9], 10);
+			b.writeInt32BE(lat, 12);
+			b.writeInt32BE(lon, 16);
+			b.writeInt32BE(area, 20);
+		}
+
+		if (Date.now() - tstart > 5000) {
+			tstart = Date.now();
+			process.stdout.write('\nStill working (' + lines + ')...');
+		}
+
+		if (datFile._writableState.needDrain) {
+			return new Promise((resolve) => {
+				datFile.write(b, resolve);
+			});
+		} else {
+			return datFile.write(b);
+		}
+	}
+
+	const dataFile = path.join(dataPath, dest);
+	const tmpDataFile = path.join(tmpPath, src);
+
+	rimraf(dataFile);
+
+	process.stdout.write('\nProcessing data (may take a moment)...');
+	var tstart = Date.now();
+	var datFile = fs.createWriteStream(dataFile);
+
+	const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile), crlfDelay: Infinity });
+	let i = 0;
+	for await (const line of rl) {
+		i++;
+		if (i === 1) continue;
+		await processLine(line);
+	}
+	datFile.close();
+}
+
+function processCityDataNames(src, dest, cb) {
+	let locId = null;
+	let linesCount = 0;
+	function processLine(line) {
+		if (line.match(/^Copyright/) || !line.match(/\d/)) return;
+
+		const b = Buffer.alloc(88);
+		const fields = CSVtoArray(line);
+		if (!fields) {
+			// Lots of cities contain ` or ' in the name and can't be parsed correctly with current method
+			console.warn('Weird line: %s::', line);
+			return;
+		}
+
+		locId = parseInt(fields[0]);
+
+		cityLookup[locId] = linesCount;
+		const cc = fields[4];
+		const rg = fields[6];
+		const city = fields[10];
+		const metro = parseInt(fields[11]);
+		// Other possible fields to include
+		const tz = fields[12];
+		const eu = fields[13];
+
+		b.fill(0);
+		b.write(cc, 0); // Country code
+		b.write(rg, 2); // Region
+
+		if (metro) b.writeInt32BE(metro, 5);
+		b.write(eu, 9); // Is in eu
+		b.write(tz, 10); // Timezone
+		b.write(city, 42); // City name
+
+		fs.writeSync(datFile, b, 0, b.length, null);
+		linesCount++;
+	}
+
+	const dataFile = path.join(dataPath, dest);
+	const tmpDataFile = path.join(tmpPath, src);
+
+	rimraf(dataFile);
+
+	var datFile = fs.openSync(dataFile, 'w');
+
+	const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile).pipe(decodeStream('utf-8')), output: process.stdout, terminal: false });
+
+	let lineCount = 0;
+	rl.on('line', line => {
+		if (lineCount > 0) processLine(line);
+
+		lineCount++;
+	});
+
+	rl.on('close', cb);
+}
+
+function processData(database, cb) {
+	if (database.skip) return cb(null, database);
+
+	const type = database.type;
+	const src = database.src;
+	const dest = database.dest;
+
+	if (type === 'country') {
+		if (Array.isArray(src)) {
+			processLookupCountry(src[0], () => {
+				processCountryData(src[1], dest[1]).then(() => {
+					return processCountryData(src[2], dest[2]);
+				}).then(() => {
+					cb(null, database);
+				});
+			});
+		}
+		else {
+			processCountryData(src, dest, () => {
+				cb(null, database);
+			});
+		}
+	} else if (type === 'city') {
+		processCityDataNames(src[0], dest[0], () => {
+			processCityData(src[1], dest[1]).then(() => {
+				console.log('\nCity data processed');
+				return processCityData(src[2], dest[2]);
+			}).then(() => {
+				console.log(' DONE');
+				cb(null, database);
+			});
+		});
+	}
+}
+
+function updateChecksum(database, cb) {
+	if (database.skip || !database.checkValue) return cb(); // Don't need to update checksums because it was not fetched or did not change
+
+	fs.writeFile(path.join(dataPath, database.type + '.checksum'), database.checkValue, 'utf8', err => {
+		if (err) console.log('Failed to Update checksums! Database:', database.type);
+		cb();
+	});
+}
+
+if (!license_key) {
+	console.error('ERROR: Missing license_key');
+	process.exit(1);
+}
+
+rimraf(tmpPath);
+mkdir(tmpPath);
+
+async.eachSeries(databases, (database, nextDatabase) => {
+	async.seq(check, fetch, extract, processData, updateChecksum)(database, nextDatabase);
+}, err => {
+	if (err) {
+		console.error('Failed to update databases from MaxMind!', err);
+		process.exit(1);
+	} else {
+		console.log('Successfully updated databases from MaxMind');
+		if (args.indexOf('debug') !== -1) {
+			console.debug('Notice: temporary files are not deleted for debug purposes');
+		} else {
+			rimraf(tmpPath);
+		}
+		process.exit(0);
+	}
+});

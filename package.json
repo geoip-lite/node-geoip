@@ -58,8 +58,7 @@
   "main": "lib/main.js",
   "typings": "index.d.ts",
   "scripts": {
-    "minify-linux": "echo \"Please wait...\n\" && bash _Minify/linux.bash",
-    "minify-win": "powershell.exe -ExecutionPolicy Bypass .\\_Minify\\windows.ps1",
+    "minify": "node minify.js",
     "test": "jest test",
     "up": "ncu -u && npm install && npm update && npm audit fix",
     "updatedb": "node utils/updatedb.js",
