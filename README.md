@@ -5,7 +5,7 @@
     <br>    
     <p>
         A native <a href="https://nodejs.org" target="_blank" title="Open nodejs.org">Node.js</a> API for the GeoLite data from MaxMind.<br>
-        This product includes GeoLite data created by MaxMind, available from: <a href="https://www.maxmind.com" target="_blank" title="Open www.maxmind.com">www.maxmind.com</a>
+        This product includes GeoLite data created by MaxMind, available from <a href="https://www.maxmind.com" target="_blank" title="Open www.maxmind.com">maxmind.com</a>.
     </p>
     <a href="https://www.npmjs.com/package/geoip-lite2" target="_blank" title="geoip-lite2 - npm" style="text-decoration:none">
         <img src="https://img.shields.io/npm/dt/geoip-lite2?maxAge=3600" alt="The number of downloads">
@@ -18,28 +18,31 @@
 
 
 # 🚀 Improved GeoIP Module by [Sefinek](https://sefinek.net)
-This module is an enhanced and updated version of [geoip-lite](https://github.com/geoip-lite/node-geoip), thoughtfully designed to adhere to the latest programming standards.
+This module is an enhanced and updated version of [geoip-lite](https://github.com/geoip-lite/node-geoip), carefully designed to meet the latest programming standards.
 
-All components have undergone meticulous updates to ensure peak performance and functionality.
-The module now operates even faster due to file minification!
+All components have been thoroughly updated to ensure optimal performance and functionality.
+The module now runs even faster, thanks to file minification!
 
-Additionally, the testing process has been enhanced by adopting the [Jest](https://www.npmjs.com/package/jest) testing library.
-This improvement strengthens testing and contributes to the overall reliability of the module.
+Furthermore, the testing process has been improved with the adoption of the [Jest](https://www.npmjs.com/package/jest) testing library.
+This upgrade enhances testing and boosts the overall reliability of the module.
 
 > I am not the primary creator of this! All copyright rights belong to the original [authors](AUTHORS).
 
 
+## ⚠️ Important
+Remember to regularly update the Maxmind database. You'll need the token for this.
+
+
 ## 🌠 Version without a Local Database
 This module requires a significant amount of RAM because geolocation data is stored in memory.
-However, you can always use the official alternative, the [geoip2-api](https://www.npmjs.com/package/geoip2-api) module, which sends a request to the API server and retrieves information about a specific IP address directly from there.
-
+However, you can always opt for the official alternative, the [geoip2-api](https://www.npmjs.com/package/geoip2-api) module, which sends requests to an API server and retrieves information about specific IP addresses directly from there.
 
 ### ✨ Demonstration
 You can see this module in action using my [official API](https://api.sefinek.net). The API interface is public and can be safely used in your projects without any limits. Happy coding!
 
-- Documentation: https://api.sefinek.net/docs/v2  
-- Specific IP: https://api.sefinek.net/api/v2/geoip/109.207.159.255?validation=false  
-- Your IP: https://api.sefinek.net/api/v2/geoip/myip
+- Specific IP: https://api.sefinek.net/api/v2/geoip/109.207.159.255
+- Client's IP: https://api.sefinek.net/api/v2/geoip/me
+- Documentation: https://api.sefinek.net/docs/v2
 
 
 ## 📑 Introduction
@@ -93,13 +96,12 @@ console.log(geo);
 
 
 ## 🛠️ Installation
-
 ### 1. Get the library
 ```cmd
 npm install geoip-lite2
 ```
 
-### 2. Update the datafiles (optional)
+### 2. Update the datafiles (recommended)
 Run `cd node_modules/geoip-lite2 && npm run updatedb license_key=YOUR_LICENSE_KEY` to update the data files. (Replace `YOUR_LICENSE_KEY` with your license key obtained from [maxmind.com](https://support.maxmind.com/hc/en-us/articles/4407111582235-Generate-a-License-Key))
 
 You can create maxmind account [here](https://www.maxmind.com/en/geolite2/signup).
@@ -248,10 +250,6 @@ console.log(process.memoryUsage());
  * }
 **/
 ```
-
-
-## 🔀 Alternatives
-If your use-case requires doing less than 100 queries through the lifetime of your application or if you need really fast latency on start-up, you might want to look into [fast-geoip](https://github.com/onramper/fast-geoip) a package with a compatible API that is optimized for serverless environments and provides faster boot times and lower memory consumption at the expense of longer lookup times.
 
 
 ## 🔖 References

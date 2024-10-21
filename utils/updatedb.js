@@ -12,8 +12,6 @@ const path = require('path');
 const zlib = require('zlib');
 const readline = require('readline');
 
-fs.existsSync = fs.existsSync || path.existsSync;
-
 const async = require('async');
 const { decodeStream } = require('iconv-lite');
 const rimraf = require('rimraf').sync;
@@ -22,19 +20,17 @@ const utils = require('../lib/utils.js');
 const { Address6, Address4 } = require('ip-address');
 
 const args = process.argv.slice(2);
-let license_key = args.find(arg => {
-	return arg.match(/^license_key=[a-zA-Z0-9]+/) !== null;
-});
+let license_key = args.find(arg => arg.match(/^license_key=[a-zA-Z0-9]+/) !== null);
 if (typeof license_key === 'undefined' && typeof process.env.LICENSE_KEY !== 'undefined') {
 	license_key = `license_key=${process.env.LICENSE_KEY}`;
 }
-let geoDataDir = args.find(arg => {
-	return arg.match(/^geoDataDir=[\w./]+/) !== null;
-});
+
+let geoDataDir = args.find(arg => arg.match(/^geoDataDir=[\w./]+/) !== null);
 if (typeof geoDataDir === 'undefined' && typeof process.env.GEODATADIR !== 'undefined') {
 	geoDataDir = `geoDataDir=${process.env.GEODATADIR}`;
 }
-let dataPath = path.resolve(__dirname, '..', 'data');
+
+let dataPath = path.resolve(__dirname, '..', 'geoip-data');
 if (typeof geoDataDir !== 'undefined') {
 	dataPath = path.resolve(process.cwd(), geoDataDir.split('=')[1]);
 	if (!fs.existsSync(dataPath)) {
@@ -42,7 +38,8 @@ if (typeof geoDataDir !== 'undefined') {
 		process.exit(1);
 	}
 }
-const tmpPath = process.env.GEOTMPDIR ? process.env.GEOTMPDIR : path.resolve(__dirname, '..', 'tmp');
+
+const tmpPath = process.env.GEOTMPDIR || path.resolve(__dirname, '..', 'tmp');
 const countryLookup = {};
 const cityLookup = { NaN: -1 };
 const databases = [{
