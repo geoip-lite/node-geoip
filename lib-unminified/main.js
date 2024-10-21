@@ -12,7 +12,7 @@ const watcherName = 'dataWatcher';
 
 const geoDataDir = path.resolve(
 	__dirname,
-	global.geoDataDir || process.env.geoDataDIR || '../data/'
+	global.geoDataDir || process.env.GEODATADIR || '../geoip-lite2/'
 );
 
 const dataFiles = {
@@ -54,16 +54,6 @@ let cache6 = JSON.parse(JSON.stringify(conf6));
 const RECORD_SIZE = 10;
 const RECORD_SIZE6 = 34;
 
-const geoData = {
-	range: '',
-	country: '',
-	region: '',
-	eu:'',
-	timezone:'',
-	city: '',
-	ll: [0, 0]
-};
-
 const lookup4 = ip => {
 	let fline = 0;
 	let floor = cache4.lastIP;
@@ -78,12 +68,21 @@ const lookup4 = ip => {
 	const recordSize = cache4.recordSize;
 	const locRecordSize = cache4.locationRecordSize;
 
-	let i;
+	const geoData = {
+		range: [null, null],
+		country: '',
+		region: '',
+		eu: '',
+		timezone:'',
+		city: '',
+		ll: [null, null]
+	};
 
 	// Outside IPv4 range
 	if (ip > cache4.lastIP || ip < cache4.firstIP) return null;
 
 	// Private IP
+	let i;
 	for (i = 0; i < privateRange.length; i++) {
 		if (ip >= privateRange[i][0] && ip <= privateRange[i][1]) return null;
 	}
@@ -138,6 +137,7 @@ const lookup6 = ip => {
 	const locBuffer = cache4.locationBuffer;
 	const locRecordSize = cache4.locationRecordSize;
 
+	const geoData = { range: [null, null], country: '', region: '', city: '', ll: [0, 0] };
 	const readIp = (line, offset) => {
 		let ii;
 		const ipArray = [];
@@ -303,10 +303,7 @@ function preload(callback) {
 		try {
 			datFile = fs.openSync(dataFiles.cityNames, 'r');
 			datSize = fs.fstatSync(datFile).size;
-
-			if (datSize === 0) {
-				throw { code: 'EMPTY_FILE' };
-			}
+			if (datSize === 0) throw { code: 'EMPTY_FILE' };
 
 			cache4.locationBuffer = Buffer.alloc(datSize);
 			fs.readSync(datFile, cache4.locationBuffer, 0, datSize, 0);
@@ -403,9 +400,7 @@ function preload6(callback) {
 			datFile = fs.openSync(dataFiles.city6, 'r');
 			datSize = fs.fstatSync(datFile).size;
 
-			if (datSize === 0) {
-				throw { code: 'EMPTY_FILE' };
-			}
+			if (datSize === 0) throw { code: 'EMPTY_FILE' };
 		} catch (err) {
 			if (err.code !== 'ENOENT' && err.code !== 'EBADF' && err.code !== 'EMPTY_FILE') {
 				throw err;
@@ -474,9 +469,7 @@ module.exports = {
 	},
 
 	// Stop watching for data updates.
-	stopWatchingDataUpdate: () => {
-		fsWatcher.stopWatching(watcherName);
-	},
+	stopWatchingDataUpdate: () => fsWatcher.stopWatching(watcherName),
 
 	// Clear data
 	clear: () => {
@@ -508,3 +501,6 @@ module.exports = {
 
 preload();
 preload6();
+
+// lookup4 = gen_lookup('geoip-country.dat', 4);
+// lookup6 = gen_lookup('geoip-country6.dat', 16);

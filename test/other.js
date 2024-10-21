@@ -1,1 +1,1 @@
-const e=require('../lib/main.js'),n=e.pretty(34525252);console.log(`version: ${e.version}\npretty: ${n}`);
+const e=require('../lib/main.js'),n=e.pretty(34525252);console.log(`Module version: ${e.version}\nIP: 34525252\nPretty: ${n}`);

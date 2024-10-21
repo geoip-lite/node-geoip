@@ -332,8 +332,8 @@ async function processCountryData(src, dest) {
 				bsz = 10;
 
 				rngip = new Address4(fields[0]);
-				sip = parseInt(rngip.startAddress().bigInteger(), 10);
-				eip = parseInt(rngip.endAddress().bigInteger(), 10);
+				sip = parseInt(rngip.startAddress().bigInt(), 10);
+				eip = parseInt(rngip.endAddress().bigInt(), 10);
 
 				b = Buffer.alloc(bsz);
 				b.fill(0);
@@ -344,7 +344,7 @@ async function processCountryData(src, dest) {
 			b.write(cc, bsz - 2);
 			if (Date.now() - tstart > 5000) {
 				tstart = Date.now();
-				process.stdout.write('\nStill working (' + lines + ')...');
+				process.stdout.write(`\nStill working (${lines})...`);
 			}
 
 			if (datFile._writableState.needDrain) {
@@ -434,8 +434,8 @@ async function processCityData(src, dest) {
 			bsz = 24;
 
 			rngip = new Address4(fields[0]);
-			sip = parseInt(rngip.startAddress().bigInteger(), 10);
-			eip = parseInt(rngip.endAddress().bigInteger(), 10);
+			sip = parseInt(rngip.startAddress().bigInt(), 10);
+			eip = parseInt(rngip.endAddress().bigInt(), 10);
 			locId = parseInt(fields[1], 10);
 			locId = cityLookup[locId];
 			b = Buffer.alloc(bsz);

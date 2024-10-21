@@ -1,0 +1,1 @@
+const o=require('../lib/main.js'),l=o.lookup('109.199.64.0'),c=o.lookup('2001:470:1:c84::111');console.log(l),console.log(c);

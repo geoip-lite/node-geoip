@@ -113,7 +113,7 @@ describe('GeoIP2', () => {
 		it('should return UTF8 city name', () => {
 			const actual = geoIp2.lookup('2.139.175.1');
 			expect(actual).toBeTruthy();
-			expect(actual.city).toBe('Barcelona');
+			expect(actual.city).toBe('Sant Cugat del Vallès');
 		});
 	});
 

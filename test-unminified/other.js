@@ -1,4 +1,6 @@
 const geoIp2 = require('../lib/main.js');
-const addr = geoIp2.pretty(34525252);
 
-console.log(`version: ${geoIp2.version}\npretty: ${addr}`);
+const ip = 34525252;
+const addr = geoIp2.pretty(ip);
+
+console.log(`Module version: ${geoIp2.version}\nIP: ${34525252}\nPretty: ${addr}`);

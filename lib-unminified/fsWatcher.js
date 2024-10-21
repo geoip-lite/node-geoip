@@ -3,15 +3,21 @@ const { join } = require('path');
 const FSWatcher = {};
 
 /**
+ * Takes an FSWatcher object and closes it.
+ * @param {string} name - The name of the watcher to close.
+ */
+const stopWatching = name => FSWatcher[name].close();
+
+/**
  * Takes a directory/file and watch for change. Upon change, call the callback.
  *
- * @param name
- * @param directory
- * @param {String} [filename]: (optional) specific filename to watch for, watches for all files in the directory if unspecified
- * @param cdDelay
- * @param callback
- **/
-function makeFsWatchFilter(name, directory, filename, cdDelay, callback) {
+ * @param {String} name - name of this watcher
+ * @param {String} directory - path to the directory to watch
+ * @param {String} [filename] - (optional) specific filename to watch for, watches for all files in the directory if unspecified
+ * @param {Number} cdDelay - delay to wait before triggering the callback
+ * @param {Function} callback - function() - called when changes are detected
+ */
+const makeFsWatchFilter = (name, directory, filename, cdDelay, callback) => {
 	let cdId = null;
 
 	// Delete the cdId and callback the outer function
@@ -58,15 +64,6 @@ function makeFsWatchFilter(name, directory, filename, cdDelay, callback) {
 	}
 
 	FSWatcher[name] = watch(directory, onWatchEvent);
-}
+};
 
-/**
- * Take a FSWatcher object and close it.
- * @param name
- **/
-function stopWatching(name) {
-	FSWatcher[name].close();
-}
-
-exports.makeFsWatchFilter = makeFsWatchFilter;
-exports.stopWatching = stopWatching;
+module.exports = { makeFsWatchFilter, stopWatching };
