@@ -24,7 +24,6 @@ All components have been thoroughly updated to ensure optimal performance and fu
 The module now runs even faster, thanks to file minification!
 
 Furthermore, the testing process has been improved with the adoption of the [Jest](https://www.npmjs.com/package/jest) testing library.
-This upgrade enhances testing and boosts the overall reliability of the module.
 
 > I am not the primary creator of this! All copyright rights belong to the original [authors](AUTHORS).
 
