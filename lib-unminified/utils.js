@@ -60,11 +60,11 @@ utils.isPrivateIP = addr => {
 	addr = addr.toString();
 
 	return addr.match(/^10\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})/) != null ||
-    addr.match(/^192\.168\.([0-9]{1,3})\.([0-9]{1,3})/) != null ||
-    addr.match(/^172\.16\.([0-9]{1,3})\.([0-9]{1,3})/) != null ||
-    addr.match(/^127\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})/) != null ||
-    addr.match(/^169\.254\.([0-9]{1,3})\.([0-9]{1,3})/) != null ||
-    addr.match(/^fc00:/) != null || addr.match(/^fe80:/) != null;
+		addr.match(/^192\.168\.([0-9]{1,3})\.([0-9]{1,3})/) != null ||
+		addr.match(/^172\.16\.([0-9]{1,3})\.([0-9]{1,3})/) != null ||
+		addr.match(/^127\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})/) != null ||
+		addr.match(/^169\.254\.([0-9]{1,3})\.([0-9]{1,3})/) != null ||
+		addr.match(/^fc00:/) != null || addr.match(/^fe80:/) != null;
 };
 
 utils.ntoa4 = n => {
