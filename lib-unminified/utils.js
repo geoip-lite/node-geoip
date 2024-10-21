@@ -70,7 +70,6 @@ utils.isPrivateIP = addr => {
 utils.ntoa4 = n => {
 	n = n.toString();
 	n = '' + (n >>> 24 & 0xff) + '.' + (n >>> 16 & 0xff) + '.' + (n >>> 8 & 0xff) + '.' + (n & 0xff);
-
 	return n;
 };
 
