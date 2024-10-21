@@ -58,12 +58,12 @@
   "main": "lib/main.js",
   "typings": "index.d.ts",
   "scripts": {
+    "up": "ncu -u && npm install && npm update && npm audit fix",
     "minify": "node minify.js",
     "test": "jest test",
-    "up": "ncu -u && npm install && npm update && npm audit fix",
-    "updatedb": "node utils/updatedb.js",
-    "updatedb-debug": "node utils/updatedb.js debug",
-    "updatedb-force": "node utils/updatedb.js force"
+    "updatedb": "node utils-minified/updatedb.js",
+    "updatedb-debug": "node utils-minified/updatedb.js debug",
+    "updatedb-force": "node utils-minified/updatedb.js force"
   },
   "dependencies": {
     "adm-zip": "^0.5.16",

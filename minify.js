@@ -1,38 +1,52 @@
-const fs = require('node:fs');
+const fs = require('node:fs/promises');
 const path = require('node:path');
 const terser = require('terser');
 
 const minifyJSFiles = async (sourceDirectory, outputDirectory) => {
-	if (!fs.existsSync(sourceDirectory)) throw new Error(`Source directory does not exist: ${sourceDirectory}`);
-	if (fs.existsSync(outputDirectory)) fs.rmSync(outputDirectory, { recursive: true });
-	fs.mkdirSync(outputDirectory, { recursive: true });
+	try {
+		await fs.access(sourceDirectory);
+	} catch {
+		throw new Error(`Source directory does not exist: ${sourceDirectory}`);
+	}
 
-	const files = fs.readdirSync(sourceDirectory).filter(file => file.endsWith('.js'));
+	await fs.rm(outputDirectory, { recursive: true, force: true });
+	await fs.mkdir(outputDirectory, { recursive: true });
 
+	const files = (await fs.readdir(sourceDirectory)).filter(file => file.endsWith('.js'));
 	for (const file of files) {
-		const inputFilePath = path.join(sourceDirectory, file);
-		const outputFilePath = path.join(outputDirectory, file);
-
 		try {
-			const code = fs.readFileSync(inputFilePath, 'utf8');
+			const code = await fs.readFile(path.join(sourceDirectory, file), 'utf8');
 			const result = await terser.minify(code, {
 				mangle: true,
 				ecma: 2024,
-				compress: true,
-				format: { quote_style: 1 },
+				module: true,
+				compress: {
+					passes: 3,
+					pure_funcs: ['console.info', 'console.debug'],
+					hoist_funs: false,
+					hoist_vars: true,
+					reduce_funcs: true,
+					reduce_vars: true,
+					unsafe: false,
+					unused: true,
+					dead_code: true
+				},
+				format: {
+					quote_style: 3,
+					preserve_annotations: true,
+					comments: false
+				},
 				toplevel: true
 			});
 
-			if (result.error) throw new Error(result.error);
-
-			fs.writeFileSync(outputFilePath, result.code, 'utf8');
+			await fs.writeFile(path.join(outputDirectory, file), result.code, 'utf8');
 			console.log(`Minimized: ${file}`);
 		} catch (err) {
 			console.error(`Error processing ${file}: ${err.message}`);
 		}
 	}
 
-	console.log(`Minimization of JavaScript files in ${sourceDirectory} completed`);
+	console.log(`Completed: ${sourceDirectory}`);
 };
 
 (async () => {
