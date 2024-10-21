@@ -70,14 +70,14 @@
     "adm-zip": "^0.5.16",
     "async": "^3.2.6",
     "iconv-lite": "0.6.3",
-    "ip-address": "^9.0.5",
+    "ip-address": "^10.0.1",
     "rimraf": "^6.0.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.11.1",
-    "globals": "^15.9.0",
+    "@eslint/js": "^9.13.0",
+    "globals": "^15.11.0",
     "jest": "^29.7.0",
-    "terser": "^5.34.1"
+    "terser": "^5.36.0"
   },
   "engines": {
     "node": ">=10.3.0"
