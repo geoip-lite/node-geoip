@@ -12,7 +12,7 @@ const watcherName = 'dataWatcher';
 
 const geoDataDir = path.resolve(
 	__dirname,
-	global.geoDataDir || process.env.GEODATADIR || '../geoip-lite2/'
+	global.geoDataDir || process.env.GEODATADIR || '../geoip-data/'
 );
 
 const dataFiles = {
