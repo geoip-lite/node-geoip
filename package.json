@@ -45,13 +45,13 @@
     "region",
     "state"
   ],
-  "homepage": "https://github.com/sefinek24/geoip-lite2#readme",
+  "homepage": "https://github.com/sefinek/geoip-lite2#readme",
   "bugs": {
-    "url": "https://github.com/sefinek24/geoip-lite2/issues"
+    "url": "https://github.com/sefinek/geoip-lite2/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sefinek24/geoip-lite2.git"
+    "url": "git+https://github.com/sefinek/geoip-lite2.git"
   },
   "license": "Apache-2.0",
   "author": "Philip Tellis <philip@bluesmoon.info> (https://bluesmoon.info)",
