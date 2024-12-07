@@ -1,6 +1,6 @@
 {
   "name": "geoip-lite2",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "A light weight native JavaScript implementation of GeoIP API from MaxMind. Improved and faster version by Sefinek.",
   "keywords": [
     "city",
@@ -37,11 +37,9 @@
     "ipv4",
     "ipv6",
     "location",
-    "low latency geoip",
     "maxmind integration",
     "maxmind lite",
     "maxmind",
-    "real time ip lookup",
     "region",
     "state"
   ],
