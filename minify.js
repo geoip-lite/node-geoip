@@ -1,6 +1,6 @@
+const terser = require('terser');
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const terser = require('terser');
 
 const minifyJSFiles = async (sourceDirectory, outputDirectory) => {
 	try {
