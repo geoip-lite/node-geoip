@@ -44,10 +44,10 @@ describe('GeoIP2', () => {
 			expect(actual.country).toBe('JP');
 			expect(actual.eu).toBe('0');
 			expect(actual.timezone).toBe('Asia/Tokyo');
-			expect(actual.city).toBe('Tokushima');
+			expect(actual.city).toBe('Higashiōmiya');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
-			expect(actual.area).toBe(500);
+			expect(actual.area).toBe(200);
 		});
 
 		it('should match data for IPv4 - RU', () => {
@@ -59,7 +59,7 @@ describe('GeoIP2', () => {
 			expect(actual.city).toBe('Nerl\'');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
-			expect(actual.area).toBe(20);
+			expect(actual.area).toBe(10);
 		});
 	});
 
@@ -70,7 +70,7 @@ describe('GeoIP2', () => {
 			expect(actual.region).toBe('14');
 			expect(actual.eu).toBe('1');
 			expect(actual.timezone).toBe('Europe/Warsaw');
-			expect(actual.city).toBe('Warsaw');
+			expect(actual.city).toBe('Nowa Wieś');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
 			expect(actual.area).toBe(200);
