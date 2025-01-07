@@ -29,24 +29,24 @@ const minifyJSFiles = async (sourceDirectory, outputDirectory) => {
 					reduce_vars: true,
 					unsafe: false,
 					unused: true,
-					dead_code: true
+					dead_code: true,
 				},
 				format: {
 					quote_style: 3,
 					preserve_annotations: true,
-					comments: false
+					comments: false,
 				},
-				toplevel: true
+				toplevel: true,
 			});
 
 			await fs.writeFile(path.join(outputDirectory, file), result.code, 'utf8');
-			console.log(`Minimized: ${file}`);
+			console.log('Minimized:', file);
 		} catch (err) {
-			console.error(`Error processing ${file}: ${err.message}`);
+			console.error(`Error processing ${file}:`, err.message);
 		}
 	}
 
-	console.log(`Completed: ${sourceDirectory}`);
+	console.log('COMPLETED:', sourceDirectory);
 };
 
 (async () => {

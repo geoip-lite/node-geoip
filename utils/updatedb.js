@@ -50,9 +50,9 @@ const databases = [{
 	src: [
 		'GeoLite2-Country-Locations-en.csv',
 		'GeoLite2-Country-Blocks-IPv4.csv',
-		'GeoLite2-Country-Blocks-IPv6.csv'
+		'GeoLite2-Country-Blocks-IPv6.csv',
 	],
-	dest: ['', 'geoip-country.dat', 'geoip-country6.dat']
+	dest: ['', 'geoip-country.dat', 'geoip-country6.dat'],
 },
 {
 	type: 'city',
@@ -62,9 +62,9 @@ const databases = [{
 	src: [
 		'GeoLite2-City-Locations-en.csv',
 		'GeoLite2-City-Blocks-IPv4.csv',
-		'GeoLite2-City-Blocks-IPv6.csv'
+		'GeoLite2-City-Blocks-IPv6.csv',
 	],
-	dest: ['geoip-city-names.dat', 'geoip-city.dat', 'geoip-city6.dat']
+	dest: ['geoip-city-names.dat', 'geoip-city.dat', 'geoip-city6.dat'],
 }];
 
 function mkdir(dirName) {
@@ -124,7 +124,7 @@ function getHTTPOptions(downloadUrl) {
 		protocol: parsedUrl.protocol,
 		host: parsedUrl.host,
 		path: parsedUrl.pathname + parsedUrl.search,
-		headers: { 'User-Agent': UserAgent }
+		headers: { 'User-Agent': UserAgent },
 	};
 
 	if (process.env.http_proxy || process.env.https_proxy) {
