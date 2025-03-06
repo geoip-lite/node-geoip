@@ -44,10 +44,10 @@ describe('GeoIP2', () => {
 			expect(actual.country).toBe('JP');
 			expect(actual.eu).toBe('0');
 			expect(actual.timezone).toBe('Asia/Tokyo');
-			expect(actual.city).toBe('Higashiōmiya');
+			expect(actual.city).toBe('Roppongi');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
-			expect(actual.area).toBe(200);
+			expect(actual.area).toBe(500);
 		});
 
 		it('should match data for IPv4 - RU', () => {
@@ -56,10 +56,10 @@ describe('GeoIP2', () => {
 			expect(actual.region).toBe('IVA');
 			expect(actual.eu).toBe('0');
 			expect(actual.timezone).toBe('Europe/Moscow');
-			expect(actual.city).toBe('Nerl\'');
+			expect(actual.city).toBe('Shuya');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
-			expect(actual.area).toBe(10);
+			expect(actual.area).toBe(50);
 		});
 	});
 
@@ -67,10 +67,10 @@ describe('GeoIP2', () => {
 		it('should match data for IPv6 - PL', () => {
 			const actual = geoIp2.lookup('2a01:118f:30a:3900:c954:e6ef:8067:d4e8');
 			expect(actual.country).toBe('PL');
-			expect(actual.region).toBe('14');
+			expect(actual.region).toBe('06');
 			expect(actual.eu).toBe('1');
 			expect(actual.timezone).toBe('Europe/Warsaw');
-			expect(actual.city).toBe('Nowa Wieś');
+			expect(actual.city).toBe('Cyców');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
 			expect(actual.area).toBe(200);
