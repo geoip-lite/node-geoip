@@ -44,10 +44,10 @@ describe('GeoIP2', () => {
 			expect(actual.country).toBe('JP');
 			expect(actual.eu).toBe('0');
 			expect(actual.timezone).toBe('Asia/Tokyo');
-			expect(actual.city).toBe('Roppongi');
+			expect(actual.city).toBe('Saitama');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
-			expect(actual.area).toBe(500);
+			expect(actual.area).toBe(200);
 		});
 
 		it('should match data for IPv4 - RU', () => {
@@ -70,10 +70,10 @@ describe('GeoIP2', () => {
 			expect(actual.region).toBe('06');
 			expect(actual.eu).toBe('1');
 			expect(actual.timezone).toBe('Europe/Warsaw');
-			expect(actual.city).toBe('Cyców');
+			expect(actual.city).toBe('Lublin');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
-			expect(actual.area).toBe(200);
+			expect(actual.area).toBe(100);
 		});
 
 		it('should match data for IPv6 - NL ', () => {
