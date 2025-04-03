@@ -71,7 +71,7 @@
     "rimraf": "^6.0.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.21.0",
+    "@eslint/js": "^9.23.0",
     "globals": "^16.0.0",
     "jest": "^29.7.0",
     "terser": "^5.39.0"
