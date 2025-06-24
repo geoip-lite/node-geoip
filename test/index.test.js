@@ -44,10 +44,10 @@ describe('GeoIP2', () => {
 			expect(actual.country).toBe('JP');
 			expect(actual.eu).toBe('0');
 			expect(actual.timezone).toBe('Asia/Tokyo');
-			expect(actual.city).toBe('Saitama');
+			expect(actual.city).toBe('');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
-			expect(actual.area).toBe(200);
+			expect(actual.area).toBe(500);
 		});
 
 		it('should match data for IPv4 - RU', () => {
@@ -56,10 +56,10 @@ describe('GeoIP2', () => {
 			expect(actual.region).toBe('IVA');
 			expect(actual.eu).toBe('0');
 			expect(actual.timezone).toBe('Europe/Moscow');
-			expect(actual.city).toBe('Shuya');
+			expect(actual.city).toBe('Kineshma');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
-			expect(actual.area).toBe(50);
+			expect(actual.area).toBe(100);
 		});
 	});
 
@@ -105,7 +105,7 @@ describe('GeoIP2', () => {
 		it('should return UTF8 city name', () => {
 			const actual = geoIp2.lookup('2.139.175.1');
 			expect(actual.country).toBe('ES');
-			expect(actual.city).toBe('Madrid');
+			expect(actual.city).toBe('Barcelona');
 			expect(actual.timezone).toBe('Europe/Madrid');
 		});
 
