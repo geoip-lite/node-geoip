@@ -5,12 +5,12 @@
 const { name, version } = require('../package.json');
 const UserAgent = `Mozilla/5.0 (compatible; ${name}/${version}; +https://github.com/sefinek/geoip-lite2)`;
 
-const fs = require('fs');
-const http = require('http');
-const https = require('https');
-const path = require('path');
-const zlib = require('zlib');
-const readline = require('readline');
+const fs = require('node:fs');
+const http = require('node:http');
+const https = require('node:https');
+const path = require('node:path');
+const zlib = require('node:zlib');
+const readline = require('node:readline');
 
 const async = require('async');
 const { decodeStream } = require('iconv-lite');
@@ -30,7 +30,7 @@ if (typeof geoDataDir === 'undefined' && typeof process.env.GEODATADIR !== 'unde
 	geoDataDir = `geoDataDir=${process.env.GEODATADIR}`;
 }
 
-let dataPath = path.resolve(__dirname, '..', 'geoip-data');
+let dataPath = path.resolve(__dirname, '..', 'data');
 if (typeof geoDataDir !== 'undefined') {
 	dataPath = path.resolve(process.cwd(), geoDataDir.split('=')[1]);
 	if (!fs.existsSync(dataPath)) {
