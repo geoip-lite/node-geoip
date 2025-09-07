@@ -55,7 +55,7 @@
   "main": "dist/main.js",
   "types": "index.d.ts",
   "directories": {
-    "lib": "src",
+    "lib": "lib",
     "test": "test"
   },
   "files": [
@@ -64,7 +64,8 @@
     "tools",
     "AUTHORS",
     "index.d.ts",
-    "LICENSE"
+    "LICENSE",
+    "README.md"
   ],
   "scripts": {
     "minify": "node minify.js",
