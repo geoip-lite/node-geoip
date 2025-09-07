@@ -1,8 +1,0 @@
-.idea
-.github
-_Minify
-lib-unminified
-test-unminified
-utils-unminified
-eslint.config.mjs
-command.txt
