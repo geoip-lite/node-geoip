@@ -161,7 +161,6 @@ function check(database, cb) {
 			if ([301, 302, 303, 307, 308].includes(status)) {
 				return https.get(getHTTPOptions(response.headers.location), onResponse);
 			} else if (status !== 200) {
-				console.error(response.data);
 				console.error('ERROR: HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 				client.end();
 				process.exit(1);
