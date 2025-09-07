@@ -52,16 +52,16 @@
   "license": "Apache-2.0",
   "author": "Philip Tellis <philip@bluesmoon.info> (https://bluesmoon.info)",
   "type": "commonjs",
-  "main": "lib-minified/main.js",
+  "main": "dist/main.js",
   "types": "index.d.ts",
   "directories": {
-    "lib": "lib",
+    "lib": "src",
     "test": "test"
   },
   "files": [
-    "geoip-data",
-    "lib-minified",
-    "utils-minified",
+    "data",
+    "dist",
+    "tools",
     "AUTHORS",
     "index.d.ts",
     "LICENSE"
@@ -70,9 +70,9 @@
     "minify": "node minify.js",
     "test": "jest test",
     "up": "ncu -u && npm install && npm update && npm audit fix",
-    "updatedb": "node utils-minified/updatedb.js",
-    "updatedb-debug": "node utils-minified/updatedb.js debug",
-    "updatedb-force": "node utils-minified/updatedb.js force"
+    "updatedb": "node tools/updatedb.js",
+    "updatedb-debug": "node tools/updatedb.js debug",
+    "updatedb-force": "node tools/updatedb.js force"
   },
   "dependencies": {
     "adm-zip": "^0.5.16",

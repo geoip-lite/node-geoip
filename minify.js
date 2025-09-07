@@ -9,7 +9,6 @@ const minifyJSFiles = async (sourceDirectory, outputDirectory) => {
 		throw new Error(`Source directory does not exist: ${sourceDirectory}`);
 	}
 
-	await fs.rm(outputDirectory, { recursive: true, force: true });
 	await fs.mkdir(outputDirectory, { recursive: true });
 
 	const files = (await fs.readdir(sourceDirectory)).filter(file => file.endsWith('.js'));
@@ -50,6 +49,7 @@ const minifyJSFiles = async (sourceDirectory, outputDirectory) => {
 };
 
 (async () => {
-	await minifyJSFiles('./lib', './lib-minified');
-	await minifyJSFiles('./utils', './utils-minified');
+	await fs.rm('./dist', { recursive: true, force: true });
+
+	await minifyJSFiles('./lib', './dist');
 })();

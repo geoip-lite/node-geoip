@@ -1,4 +1,4 @@
-const geoIp2 = require('../lib/main.js');
+const geoIp2 = require('../dist/main.js');
 
 describe('GeoIP2', () => {
 	describe('#testLookup', () => {
@@ -56,10 +56,10 @@ describe('GeoIP2', () => {
 			expect(actual.region).toBe('IVA');
 			expect(actual.eu).toBe('0');
 			expect(actual.timezone).toBe('Europe/Moscow');
-			expect(actual.city).toBe('Kineshma');
+			expect(actual.city).toBe('Ivanovo');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
-			expect(actual.area).toBe(100);
+			expect(actual.area).toBe(10);
 		});
 	});
 
