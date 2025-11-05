@@ -2,12 +2,12 @@ interface GeoIp2Location {
     range: [number | null, number | null];
     country: string;
     region: string;
-    eu: '0' | '1';
+    eu: '0' | '1' | '';
     timezone: string;
     city: string;
     ll: [number | null, number | null];
-    metro: number;
-    area: number;
+    metro: number | null;
+    area: number | null;
 }
 
 export function lookup(ip: string | number): GeoIp2Location | null;
