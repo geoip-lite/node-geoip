@@ -38,7 +38,7 @@ describe('Performance Tests', () => {
 				'1.1.1.1',
 				'2001:4860:4860::8888',
 				'72.229.28.185',
-				'2606:4700:4700::1111'
+				'2606:4700:4700::1111',
 			];
 
 			const start = Date.now();
@@ -144,7 +144,7 @@ describe('Performance Tests', () => {
 
 		it('should handle invalid inputs without performance degradation', () => {
 			const invalidInputs = [
-				null, undefined, '', 'invalid', {}, [], true, false, -1
+				null, undefined, '', 'invalid', {}, [], true, false, -1,
 			];
 
 			const start = Date.now();

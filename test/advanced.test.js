@@ -143,14 +143,14 @@ describe('Advanced GeoIP2 Tests', () => {
 		it('should return data for various public IPs', () => {
 			// Test multiple public IPs have geo data
 			const ips = [
-				'5.1.83.0',     // Europe
-				'5.39.0.0',     // Europe
-				'5.62.0.0',     // Europe
-				'1.0.1.0',      // Asia
-				'1.128.0.0',    // Asia/Pacific
-				'177.0.0.0',    // South America
-				'14.96.0.0',    // Asia
-				'24.48.0.0'     // North America
+				'5.1.83.0', // Europe
+				'5.39.0.0', // Europe
+				'5.62.0.0', // Europe
+				'1.0.1.0', // Asia
+				'1.128.0.0', // Asia/Pacific
+				'177.0.0.0', // South America
+				'14.96.0.0', // Asia
+				'24.48.0.0', // North America
 			];
 
 			ips.forEach(ip => {
