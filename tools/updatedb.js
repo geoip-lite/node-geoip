@@ -156,6 +156,8 @@ function check(database, cb) {
 
 		console.log('Checking', database.fileName);
 
+		const client = https.get(getHTTPOptions(checksumUrl), onResponse);
+
 		function onResponse(response) {
 			const status = response.statusCode;
 			if ([301, 302, 303, 307, 308].includes(status)) {
@@ -190,8 +192,6 @@ function check(database, cb) {
 				cb(null, database);
 			});
 		}
-
-		var client = https.get(getHTTPOptions(checksumUrl), onResponse);
 	});
 }
 
@@ -207,6 +207,8 @@ function fetch(database, cb) {
 	if (fs.existsSync(tmpFile)) return cb(null, tmpFile, fileName, database);
 
 	console.log('Fetching', fileName);
+
+	const client = https.get(getHTTPOptions(downloadUrl), onResponse);
 
 	function onResponse(response) {
 		const status = response.statusCode;
@@ -234,8 +236,6 @@ function fetch(database, cb) {
 	}
 
 	mkdir(tmpFile);
-
-	var client = https.get(getHTTPOptions(downloadUrl), onResponse);
 
 	process.stdout.write(`Retrieving ${fileName}...`);
 }
@@ -294,6 +294,16 @@ function processLookupCountry(src, cb) {
 
 async function processCountryData(src, dest) {
 	let lines = 0;
+	const dataFile = path.join(dataPath, dest);
+	const tmpDataFile = path.join(tmpPath, src);
+
+	rimraf(dataFile);
+	mkdir(dataFile);
+
+	process.stdout.write('\nProcessing data (may take a moment)...');
+	let tstart = Date.now();
+	const datFile = fs.createWriteStream(dataFile);
+
 	function processLine(line) {
 		const fields = CSVtoArray(line);
 		if (!fields || fields.length < 6) return console.warn('weird line: %s::', line);
@@ -353,16 +363,6 @@ async function processCountryData(src, dest) {
 		}
 	}
 
-	const dataFile = path.join(dataPath, dest);
-	const tmpDataFile = path.join(tmpPath, src);
-
-	rimraf(dataFile);
-	mkdir(dataFile);
-
-	process.stdout.write('\nProcessing data (may take a moment)...');
-	var tstart = Date.now();
-	var datFile = fs.createWriteStream(dataFile);
-
 	const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile), crlfDelay: Infinity });
 	let i = 0;
 	for await (const line of rl) {
@@ -376,6 +376,15 @@ async function processCountryData(src, dest) {
 
 async function processCityData(src, dest) {
 	let lines = 0;
+	const dataFile = path.join(dataPath, dest);
+	const tmpDataFile = path.join(tmpPath, src);
+
+	rimraf(dataFile);
+
+	process.stdout.write('\nProcessing data (may take a moment)...');
+	let tstart = Date.now();
+	const datFile = fs.createWriteStream(dataFile);
+
 	async function processLine(line) {
 		if (line.match(/^Copyright/) || !line.match(/\d/)) return;
 
@@ -462,15 +471,6 @@ async function processCityData(src, dest) {
 		}
 	}
 
-	const dataFile = path.join(dataPath, dest);
-	const tmpDataFile = path.join(tmpPath, src);
-
-	rimraf(dataFile);
-
-	process.stdout.write('\nProcessing data (may take a moment)...');
-	var tstart = Date.now();
-	var datFile = fs.createWriteStream(dataFile);
-
 	const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile), crlfDelay: Infinity });
 	let i = 0;
 	for await (const line of rl) {
@@ -484,6 +484,13 @@ async function processCityData(src, dest) {
 function processCityDataNames(src, dest, cb) {
 	let locId = null;
 	let linesCount = 0;
+	const dataFile = path.join(dataPath, dest);
+	const tmpDataFile = path.join(tmpPath, src);
+
+	rimraf(dataFile);
+
+	const datFile = fs.openSync(dataFile, 'w');
+
 	function processLine(line) {
 		if (line.match(/^Copyright/) || !line.match(/\d/)) return;
 
@@ -518,13 +525,6 @@ function processCityDataNames(src, dest, cb) {
 		fs.writeSync(datFile, b, 0, b.length, null);
 		linesCount++;
 	}
-
-	const dataFile = path.join(dataPath, dest);
-	const tmpDataFile = path.join(tmpPath, src);
-
-	rimraf(dataFile);
-
-	var datFile = fs.openSync(dataFile, 'w');
 
 	const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile).pipe(decodeStream('utf-8')), output: process.stdout, terminal: false });
 
