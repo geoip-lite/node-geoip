@@ -44,7 +44,7 @@ describe('GeoIP2', () => {
 			expect(actual.country).toBe('JP');
 			expect(actual.eu).toBe('0');
 			expect(actual.timezone).toBe('Asia/Tokyo');
-			expect(actual.city).toBe('');
+			expect(actual.city).toBe('Ueda');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
 			expect(actual.area).toBe(500);
@@ -70,7 +70,7 @@ describe('GeoIP2', () => {
 			expect(actual.region).toBe('06');
 			expect(actual.eu).toBe('1');
 			expect(actual.timezone).toBe('Europe/Warsaw');
-			expect(actual.city).toBe('Lublin');
+			expect(actual.city).toBe('Konopnica');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
 			expect(actual.area).toBe(100);
