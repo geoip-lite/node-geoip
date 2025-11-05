@@ -17,7 +17,7 @@ const minifyJSFiles = async (sourceDirectory, outputDirectory) => {
 			const code = await fs.readFile(path.join(sourceDirectory, file), 'utf8');
 			const result = await terser.minify(code, {
 				mangle: true,
-				ecma: 2024,
+				ecma: 2025,
 				module: true,
 				compress: {
 					passes: 3,
