@@ -18,26 +18,18 @@
 
 
 # 🚀 Improved GeoIP Module by [Sefinek](https://sefinek.net)
-This module is an enhanced and updated version of [geoip-lite](https://github.com/geoip-lite/node-geoip), carefully designed to meet the latest programming standards.
+This module is an optimized version of [geoip-lite](https://github.com/geoip-lite/node-geoip) and runs slightly faster.
+The project has been migrated to the [Jest](https://www.npmjs.com/package/jest) testing library.
 
-All components have been thoroughly updated to ensure optimal performance and functionality.
-The module now runs even faster, thanks to file minification!
-
-Furthermore, the testing process has been improved with the adoption of the [Jest](https://www.npmjs.com/package/jest) testing library.
-
-> I am not the primary creator of this! All copyright rights belong to the original [authors](AUTHORS).
+> I am not the primary creator of this project! All copyright rights belong to the original [authors](AUTHORS).
 
 
 ## ⚠️ Important
-Remember to regularly update the Maxmind database. You'll need the token for this.
+Remember to regularly update the MaxMind database. You'll need the token for this.
 
 
-## 🌠 Version without a Local Database
-This module requires a significant amount of RAM because geolocation data is stored in memory.
-However, you can always opt for the official alternative, the [geoip2-api](https://www.npmjs.com/package/geoip2-api) module, which sends requests to an API server and retrieves information about specific IP addresses directly from there.
-
-### ✨ Demonstration
-You can see this module in action using my [official API](https://api.sefinek.net). The API interface is public and can be safely used in your projects without any limits. Happy coding!
+## ✨ API
+You can see this module in action using my [official API](https://api.sefinek.net). The `/api/v2/geoip` endpoint should not be used in production environments.
 
 - Specific IP: https://api.sefinek.net/api/v2/geoip/109.207.159.255
 - Client's IP: https://api.sefinek.net/api/v2/geoip/me
