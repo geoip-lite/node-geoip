@@ -251,7 +251,6 @@ console.log(process.memoryUsage());
 
 ## 👥 Copyright
 `GeoIP-Lite` is Copyright 2011-2018 **Philip Tellis** <philip@bluesmoon.info>  
-`GeoIP-Lite2` is Copyright 2023-2024 **Sefinek** <contact@sefinek.net> (https://sefinek.net)
 
 
 ## 🔐 License
