@@ -1,6 +1,13 @@
-// Fetches and converts MaxMind lite databases
+// ============================================================================
+// GeoIP Database Updater
+// Fetches and converts MaxMind GeoLite2 databases
+// ============================================================================
 
 'use strict';
+
+// ============================================================================
+// Dependencies
+// ============================================================================
 
 const { name, version } = require('../package.json');
 const UserAgent = `Mozilla/5.0 (compatible; ${name}/${version}; +https://github.com/sefinek/geoip-lite2)`;
@@ -18,6 +25,10 @@ const rimraf = require('rimraf').sync;
 const AdmZip = require('adm-zip');
 const utils = require('../lib/utils.js');
 const { Address6, Address4 } = require('ip-address');
+
+// ============================================================================
+// Configuration
+// ============================================================================
 
 const args = process.argv.slice(2);
 let license_key = args.find(arg => arg.match(/^license_key=[a-zA-Z0-9]+/) !== null);
@@ -66,6 +77,10 @@ const databases = [{
 	],
 	dest: ['geoip-city-names.dat', 'geoip-city.dat', 'geoip-city6.dat'],
 }];
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
 
 function mkdir(dirName) {
 	const dir = path.dirname(dirName);
@@ -118,6 +133,10 @@ function CSVtoArray(text) {
 	return a;
 }
 
+// ============================================================================
+// HTTP Configuration
+// ============================================================================
+
 function getHTTPOptions(downloadUrl) {
 	const parsedUrl = new URL(downloadUrl);
 	const options = {
@@ -139,6 +158,10 @@ function getHTTPOptions(downloadUrl) {
 
 	return options;
 }
+
+// ============================================================================
+// Database Download Functions
+// ============================================================================
 
 function check(database, cb) {
 	if (args.indexOf('force') !== -1) {
@@ -291,6 +314,10 @@ function processLookupCountry(src, cb) {
 		cb();
 	});
 }
+
+// ============================================================================
+// Data Processing Functions
+// ============================================================================
 
 async function processCountryData(src, dest) {
 	let lines = 0;
@@ -538,6 +565,10 @@ function processCityDataNames(src, dest, cb) {
 	rl.on('close', cb);
 }
 
+// ============================================================================
+// Main Processing Dispatcher
+// ============================================================================
+
 function processData(database, cb) {
 	if (database.skip) return cb(null, database);
 
@@ -573,6 +604,10 @@ function processData(database, cb) {
 	}
 }
 
+// ============================================================================
+// Checksum Management
+// ============================================================================
+
 function updateChecksum(database, cb) {
 	if (database.skip || !database.checkValue) return cb(); // Don't need to update checksums because it was not fetched or did not change
 
@@ -581,6 +616,10 @@ function updateChecksum(database, cb) {
 		cb();
 	});
 }
+
+// ============================================================================
+// Main Execution Flow
+// ============================================================================
 
 if (!license_key) {
 	console.error('ERROR: Missing license_key');
