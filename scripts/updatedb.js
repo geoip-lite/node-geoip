@@ -145,7 +145,11 @@ function getHTTPOptions(downloadUrl) {
 
 	if (process.env.http_proxy || process.env.https_proxy) {
 		try {
-			var HttpsProxyAgent = require('https-proxy-agent');
+			var HttpsProxyAgentModule = require('https-proxy-agent');
+			// Handle both v5/v6 (default export) and v7+ (named export) formats
+			var HttpsProxyAgent = typeof HttpsProxyAgentModule === 'function'
+				? HttpsProxyAgentModule
+				: (HttpsProxyAgentModule.HttpsProxyAgent || HttpsProxyAgentModule.default || HttpsProxyAgentModule);
 			options.agent = new HttpsProxyAgent(process.env.http_proxy || process.env.https_proxy);
 		}
 		catch (e) {
