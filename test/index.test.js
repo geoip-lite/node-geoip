@@ -16,7 +16,7 @@ describe('GeoIP2', () => {
 
 	describe('#testDataIP4', () => {
 		it('should match data for IPv4 - PL', () => {
-			const actual = geoIp2.lookup('104.113.255.255');
+			const actual = geoIp2.lookup('83.13.246.1');
 			expect(actual.country).toBe('PL');
 			expect(actual.region).toBe('14');
 			expect(actual.eu).toBe('1');
@@ -24,7 +24,7 @@ describe('GeoIP2', () => {
 			expect(actual.city).toBe('Warsaw');
 			expect(actual.ll).toBeTruthy();
 			expect(actual.metro).toBe(0);
-			expect(actual.area).toBe(20);
+			expect(actual.area).toBe(10);
 		});
 
 		it('should match data for IPv4 - US', () => {

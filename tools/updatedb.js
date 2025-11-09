@@ -27,6 +27,20 @@ const utils = require('../lib/utils.js');
 const { Address6, Address4 } = require('ip-address');
 
 // ============================================================================
+// Utility Functions - Logging
+// ============================================================================
+
+// Logging utility for consistent and readable output
+const log = {
+	info: (msg, ...logArgs) => console.log('[INFO]', msg, ...logArgs),
+	success: (msg, ...logArgs) => console.log('[SUCCESS]', msg, ...logArgs),
+	warn: (msg, ...logArgs) => console.warn('[WARN]', msg, ...logArgs),
+	error: (msg, ...logArgs) => console.error('[ERROR]', msg, ...logArgs),
+	progress: (msg) => process.stdout.write(`[INFO] ${msg}... `),
+	done: () => console.log('Done'),
+};
+
+// ============================================================================
 // Configuration
 // ============================================================================
 
@@ -81,16 +95,6 @@ const databases = [{
 // ============================================================================
 // Utility Functions
 // ============================================================================
-
-// Logging utility for consistent and readable output
-const log = {
-	info: (msg, ...args) => console.log('[INFO]', msg, ...args),
-	success: (msg, ...args) => console.log('[SUCCESS]', msg, ...args),
-	warn: (msg, ...args) => console.warn('[WARN]', msg, ...args),
-	error: (msg, ...args) => console.error('[ERROR]', msg, ...args),
-	progress: (msg) => process.stdout.write(`[INFO] ${msg}... `),
-	done: () => console.log('Done'),
-};
 
 function mkdir(dirName) {
 	const dir = path.dirname(dirName);
@@ -607,7 +611,7 @@ function processData(database, cb) {
 		processCityDataNames(src[0], dest[0], () => {
 			processCityData(src[1], dest[1]).then(() => {
 				process.stdout.write('\n');
-			log.info('City IPv4 data processed');
+				log.info('City IPv4 data processed');
 				return processCityData(src[2], dest[2]);
 			}).then(() => {
 				log.info('City IPv6 data processed');

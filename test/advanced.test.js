@@ -182,7 +182,7 @@ describe('Advanced GeoIP2 Tests', () => {
 
 	describe('#EUFlag', () => {
 		it('should have EU flag "1" for EU countries', () => {
-			const poland = geoIp2.lookup('104.113.255.255');
+			const poland = geoIp2.lookup('83.13.246.1');
 			expect(poland.eu).toBe('1');
 
 			const netherlands = geoIp2.lookup('2001:1c04:400::1');
