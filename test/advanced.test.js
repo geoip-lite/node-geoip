@@ -8,7 +8,7 @@ describe('Advanced GeoIP2 Tests', () => {
 		});
 
 		it('should handle full IPv6 addresses', () => {
-			const result = geoIp2.lookup('2001:4860:4860:0000:0000:0000:0000:8888');
+			const result = geoIp2.lookup('2a01:11bf:5427:89a8:dc43:4b56:1a17:c2d4');
 			expect(result).not.toBeNull();
 		});
 
