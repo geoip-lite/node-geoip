@@ -66,7 +66,7 @@ const mappedDuration = Date.now() - mappedStart;
 const mappedThroughput = Math.round(100000 / (mappedDuration / 1000));
 
 console.log(`  Test IPs:    ${mappedIPs.length} different formats`);
-console.log(`  Iterations:  100,000`);
+console.log('  Iterations:  100,000');
 console.log(`  Duration:    ${mappedDuration}ms`);
 console.log(`  Throughput:  ${mappedThroughput.toLocaleString()} ops/sec`);
 
@@ -94,7 +94,7 @@ for (let i = 0; i < 1000000; i++) {
 const ntoaDuration = Date.now() - ntoaStart;
 const ntoaThroughput = Math.round(1000000 / (ntoaDuration / 1000));
 
-console.log(`  Iterations:  1,000,000`);
+console.log('  Iterations:  1,000,000');
 console.log(`  Duration:    ${ntoaDuration}ms`);
 console.log(`  Throughput:  ${ntoaThroughput.toLocaleString()} ops/sec`);
 console.log(`  Per call:    ${(ntoaDuration / 1000000 * 1000).toFixed(4)}ms`);
@@ -183,7 +183,7 @@ for (let i = 0; i < 100000; i++) {
 const privateDuration = Date.now() - privateStart;
 const privateThroughput = Math.round(100000 / (privateDuration / 1000));
 
-console.log(`  Iterations:  100,000`);
+console.log('  Iterations:  100,000');
 console.log(`  Duration:    ${privateDuration}ms`);
 console.log(`  Throughput:  ${privateThroughput.toLocaleString()} ops/sec`);
 
