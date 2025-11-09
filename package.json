@@ -1,6 +1,6 @@
 {
   "name": "geoip-lite2",
-  "version": "2.2.8-beta.2",
+  "version": "2.2.8-beta.3",
   "description": "A light weight native JavaScript implementation of GeoIP API from MaxMind. Improved and faster version by Sefinek.",
   "keywords": [
     "city",
