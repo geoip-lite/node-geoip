@@ -45,7 +45,7 @@ let dataPath = path.resolve(__dirname, '..', 'data');
 if (typeof geoDataDir !== 'undefined') {
 	dataPath = path.resolve(process.cwd(), geoDataDir.split('=')[1]);
 	if (!fs.existsSync(dataPath)) {
-		console.log('ERROR: Directory doesn\'t exist: ' + dataPath);
+		log.error('Directory does not exist:', dataPath);
 		process.exit(1);
 	}
 }
@@ -81,6 +81,16 @@ const databases = [{
 // ============================================================================
 // Utility Functions
 // ============================================================================
+
+// Logging utility for consistent and readable output
+const log = {
+	info: (msg, ...args) => console.log('[INFO]', msg, ...args),
+	success: (msg, ...args) => console.log('[SUCCESS]', msg, ...args),
+	warn: (msg, ...args) => console.warn('[WARN]', msg, ...args),
+	error: (msg, ...args) => console.error('[ERROR]', msg, ...args),
+	progress: (msg) => process.stdout.write(`[INFO] ${msg}... `),
+	done: () => console.log('Done'),
+};
 
 function mkdir(dirName) {
 	const dir = path.dirname(dirName);
@@ -151,7 +161,7 @@ function getHTTPOptions(downloadUrl) {
 			const HttpsProxyAgent = require('https-proxy-agent');
 			options.agent = new HttpsProxyAgent(process.env.http_proxy || process.env.https_proxy);
 		} catch (err) {
-			console.error(`Install https-proxy-agent to use an HTTP/HTTPS proxy. ${err.message}`);
+			log.error(`Install https-proxy-agent to use an HTTP/HTTPS proxy. ${err.message}`);
 			process.exit(-1);
 		}
 	}
@@ -177,7 +187,7 @@ function check(database, cb) {
 	fs.readFile(path.join(dataPath, `${database.type}.checksum`), { encoding: 'utf8' }, (err, data) => {
 		if (!err && data && data.length) database.checkValue = data;
 
-		console.log('Checking', database.fileName);
+		log.info('Checking database:', database.fileName);
 
 		const client = https.get(getHTTPOptions(checksumUrl), onResponse);
 
@@ -186,7 +196,7 @@ function check(database, cb) {
 			if ([301, 302, 303, 307, 308].includes(status)) {
 				return https.get(getHTTPOptions(response.headers.location), onResponse);
 			} else if (status !== 200) {
-				console.error('ERROR: HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
+				log.error('HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 				client.end();
 				process.exit(1);
 			}
@@ -199,16 +209,16 @@ function check(database, cb) {
 			response.on('end', () => {
 				if (str && str.length) {
 					if (str === database.checkValue) {
-						console.log(`Database "${database.type}" is up to date`);
+						log.info(`Database "${database.type}" is up to date`);
 						database.skip = true;
 					} else {
-						console.log(`Database "${database.type}" has new data`);
+						log.info(`Database "${database.type}" has new data available`);
 						database.checkValue = str;
 					}
 				}
 				else {
-					console.error(`ERROR: Could not retrieve checksum for ${database.type}. Aborting.`);
-					console.error('Run with "force" to update without checksum');
+					log.error(`Could not retrieve checksum for ${database.type}. Aborting.`);
+					log.error('Run with "force" to update without checksum');
 					client.end();
 					process.exit(1);
 				}
@@ -229,7 +239,7 @@ function fetch(database, cb) {
 	const tmpFile = path.join(tmpPath, fileName);
 	if (fs.existsSync(tmpFile)) return cb(null, tmpFile, fileName, database);
 
-	console.log('Fetching', fileName);
+	log.info('Downloading:', fileName);
 
 	const client = https.get(getHTTPOptions(downloadUrl), onResponse);
 
@@ -238,7 +248,7 @@ function fetch(database, cb) {
 		if ([301, 302, 303, 307, 308].includes(status)) {
 			return https.get(getHTTPOptions(response.headers.location), onResponse);
 		} else if (status !== 200) {
-			console.error('ERROR: HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
+			log.error('HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
 			client.end();
 			process.exit(1);
 		}
@@ -253,14 +263,14 @@ function fetch(database, cb) {
 		}
 
 		tmpFilePipe.on('close', () => {
-			console.log(' DONE');
+			log.done();
 			cb(null, tmpFile, fileName, database);
 		});
 	}
 
 	mkdir(tmpFile);
 
-	process.stdout.write(`Retrieving ${fileName}...`);
+	log.progress(`Retrieving ${fileName}`);
 }
 
 function extract(tmpFile, tmpFileName, database, cb) {
@@ -269,7 +279,7 @@ function extract(tmpFile, tmpFileName, database, cb) {
 	if (path.extname(tmpFileName) !== '.zip') {
 		cb(null, database);
 	} else {
-		process.stdout.write('Extracting ' + tmpFileName + '...');
+		log.progress('Extracting ' + tmpFileName);
 		const zip = new AdmZip(tmpFile);
 		const zipEntries = zip.getEntries();
 
@@ -283,7 +293,7 @@ function extract(tmpFile, tmpFileName, database, cb) {
 			fs.writeFileSync(destinationPath, entry.getData());
 		});
 
-		console.log(' DONE');
+		log.done();
 		cb(null, database);
 	}
 }
@@ -292,14 +302,14 @@ function processLookupCountry(src, cb) {
 	function processLine(line) {
 		const fields = CSVtoArray(line);
 		if (!fields || fields.length < 6) {
-			console.log('Weird line: %s::', line);
+			log.warn('Malformed line detected:', line);
 			return;
 		}
 		countryLookup[fields[0]] = fields[4];
 	}
 	const tmpDataFile = path.join(tmpPath, src);
 
-	process.stdout.write('Processing lookup data (may take a moment)...');
+	log.progress('Processing lookup data (this may take a moment)');
 
 	const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile).pipe(decodeStream('latin1')), output: process.stdout, terminal: false });
 
@@ -310,7 +320,7 @@ function processLookupCountry(src, cb) {
 	});
 
 	rl.on('close', () => {
-		console.log(' DONE');
+		log.done();
 		cb();
 	});
 }
@@ -327,13 +337,14 @@ async function processCountryData(src, dest) {
 	rimraf(dataFile);
 	mkdir(dataFile);
 
-	process.stdout.write('\nProcessing data (may take a moment)...');
+	process.stdout.write('\n');
+	log.progress('Processing country data (this may take a moment)');
 	let tstart = Date.now();
 	const datFile = fs.createWriteStream(dataFile);
 
 	function processLine(line) {
 		const fields = CSVtoArray(line);
-		if (!fields || fields.length < 6) return console.warn('weird line: %s::', line);
+		if (!fields || fields.length < 6) return log.warn('Malformed line detected:', line);
 
 		lines++;
 
@@ -398,7 +409,7 @@ async function processCountryData(src, dest) {
 		await processLine(line);
 	}
 	datFile.close();
-	console.log(' DONE');
+	log.done();
 }
 
 async function processCityData(src, dest) {
@@ -408,7 +419,8 @@ async function processCityData(src, dest) {
 
 	rimraf(dataFile);
 
-	process.stdout.write('\nProcessing data (may take a moment)...');
+	process.stdout.write('\n');
+	log.progress('Processing city data (this may take a moment)');
 	let tstart = Date.now();
 	const datFile = fs.createWriteStream(dataFile);
 
@@ -416,7 +428,7 @@ async function processCityData(src, dest) {
 		if (line.match(/^Copyright/) || !line.match(/\d/)) return;
 
 		const fields = CSVtoArray(line);
-		if (!fields) return console.warn('Weird line: %s::', line);
+		if (!fields) return log.warn('Malformed line detected:', line);
 		let sip;
 		let eip;
 		let rngip;
@@ -486,7 +498,7 @@ async function processCityData(src, dest) {
 
 		if (Date.now() - tstart > 5000) {
 			tstart = Date.now();
-			process.stdout.write('\nStill working (' + lines + ')...');
+			process.stdout.write('\n[INFO] Processing... (' + lines + ' entries) ');
 		}
 
 		if (datFile._writableState.needDrain) {
@@ -525,7 +537,7 @@ function processCityDataNames(src, dest, cb) {
 		const fields = CSVtoArray(line);
 		if (!fields) {
 			// Lots of cities contain ` or ' in the name and can't be parsed correctly with current method
-			console.warn('Weird line: %s::', line);
+			log.warn('Malformed line detected:', line);
 			return;
 		}
 
@@ -594,10 +606,11 @@ function processData(database, cb) {
 	} else if (type === 'city') {
 		processCityDataNames(src[0], dest[0], () => {
 			processCityData(src[1], dest[1]).then(() => {
-				console.log('\nCity data processed');
+				process.stdout.write('\n');
+			log.info('City IPv4 data processed');
 				return processCityData(src[2], dest[2]);
 			}).then(() => {
-				console.log(' DONE');
+				log.info('City IPv6 data processed');
 				cb(null, database);
 			});
 		});
@@ -612,7 +625,7 @@ function updateChecksum(database, cb) {
 	if (database.skip || !database.checkValue) return cb(); // Don't need to update checksums because it was not fetched or did not change
 
 	fs.writeFile(path.join(dataPath, database.type + '.checksum'), database.checkValue, 'utf8', err => {
-		if (err) console.log('Failed to Update checksums! Database:', database.type);
+		if (err) log.error('Failed to update checksum for database:', database.type);
 		cb();
 	});
 }
@@ -622,7 +635,7 @@ function updateChecksum(database, cb) {
 // ============================================================================
 
 if (!license_key) {
-	console.error('ERROR: Missing license_key');
+	log.error('Missing license_key');
 	process.exit(1);
 }
 
@@ -633,10 +646,11 @@ async.eachSeries(databases, (database, nextDatabase) => {
 	async.seq(check, fetch, extract, processData, updateChecksum)(database, nextDatabase);
 }, err => {
 	if (err) {
-		console.error('Failed to update databases from MaxMind!', err);
+		log.error('Failed to update databases from MaxMind!', err);
 		process.exit(1);
 	} else {
-		console.log('Successfully updated databases from MaxMind');
+		process.stdout.write('\n');
+		log.success('All databases have been successfully updated from MaxMind');
 		if (args.indexOf('debug') !== -1) {
 			console.debug('Notice: temporary files are not deleted for debug purposes');
 		} else {
