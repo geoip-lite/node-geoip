@@ -32,12 +32,10 @@ const { Address6, Address4 } = require('ip-address');
 
 // Logging utility for consistent and readable output
 const log = {
-	info: (msg, ...logArgs) => console.log('[INFO]', msg, ...logArgs),
-	success: (msg, ...logArgs) => console.log('[SUCCESS]', msg, ...logArgs),
-	warn: (msg, ...logArgs) => console.warn('[WARN]', msg, ...logArgs),
-	error: (msg, ...logArgs) => console.error('[ERROR]', msg, ...logArgs),
-	progress: (msg) => process.stdout.write(`[INFO] ${msg}... `),
-	done: () => console.log('Done'),
+	info: (msg, ...logArgs) => console.log(`[INFO] ${msg}`, ...logArgs),
+	success: (msg, ...logArgs) => console.log(`[SUCCESS] ${msg}`, ...logArgs),
+	warn: (msg, ...logArgs) => console.warn(`[WARN] ${msg}`, ...logArgs),
+	error: (msg, ...logArgs) => console.error(`[ERROR] ${msg}`, ...logArgs),
 };
 
 // ============================================================================
@@ -267,14 +265,12 @@ function fetch(database, cb) {
 		}
 
 		tmpFilePipe.on('close', () => {
-			log.done();
+			log.info(`Retrieved ${fileName}`);
 			cb(null, tmpFile, fileName, database);
 		});
 	}
 
 	mkdir(tmpFile);
-
-	log.progress(`Retrieving ${fileName}`);
 }
 
 function extract(tmpFile, tmpFileName, database, cb) {
@@ -283,7 +279,7 @@ function extract(tmpFile, tmpFileName, database, cb) {
 	if (path.extname(tmpFileName) !== '.zip') {
 		cb(null, database);
 	} else {
-		log.progress('Extracting ' + tmpFileName);
+		log.info('Extracting ' + tmpFileName);
 		const zip = new AdmZip(tmpFile);
 		const zipEntries = zip.getEntries();
 
@@ -297,7 +293,7 @@ function extract(tmpFile, tmpFileName, database, cb) {
 			fs.writeFileSync(destinationPath, entry.getData());
 		});
 
-		log.done();
+		log.info('Extracted ' + tmpFileName);
 		cb(null, database);
 	}
 }
@@ -313,7 +309,7 @@ function processLookupCountry(src, cb) {
 	}
 	const tmpDataFile = path.join(tmpPath, src);
 
-	log.progress('Processing lookup data (this may take a moment)');
+	log.info('Processing lookup data');
 
 	const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile).pipe(decodeStream('latin1')), output: process.stdout, terminal: false });
 
@@ -324,7 +320,7 @@ function processLookupCountry(src, cb) {
 	});
 
 	rl.on('close', () => {
-		log.done();
+		log.info('Processed lookup data');
 		cb();
 	});
 }
@@ -341,8 +337,7 @@ async function processCountryData(src, dest) {
 	rimraf(dataFile);
 	mkdir(dataFile);
 
-	process.stdout.write('\n');
-	log.progress('Processing country data (this may take a moment)');
+	log.info('Processing country data');
 	let tstart = Date.now();
 	const datFile = fs.createWriteStream(dataFile);
 
@@ -392,7 +387,7 @@ async function processCountryData(src, dest) {
 			b.write(cc, bsz - 2);
 			if (Date.now() - tstart > 5000) {
 				tstart = Date.now();
-				process.stdout.write(`\nStill working (${lines})...`);
+				log.info(`Processing country data (${lines} entries)`);
 			}
 
 			if (datFile._writableState.needDrain) {
@@ -451,7 +446,7 @@ async function processCountryData(src, dest) {
                 rl.on('error', finish);
         });
         datFile.close();
-        log.done();
+        log.info('Processed country data');
 }
 
 async function processCityData(src, dest) {
@@ -461,8 +456,7 @@ async function processCityData(src, dest) {
 
 	rimraf(dataFile);
 
-	process.stdout.write('\n');
-	log.progress('Processing city data (this may take a moment)');
+	log.info('Processing city data');
 	let tstart = Date.now();
 	const datFile = fs.createWriteStream(dataFile);
 
@@ -540,7 +534,7 @@ async function processCityData(src, dest) {
 
 		if (Date.now() - tstart > 5000) {
 			tstart = Date.now();
-			process.stdout.write('\n[INFO] Processing... (' + lines + ' entries) ');
+			log.info(`Processing city data (${lines} entries)`);
 		}
 
 		if (datFile._writableState.needDrain) {
@@ -686,11 +680,10 @@ function processData(database, cb) {
 	} else if (type === 'city') {
 		processCityDataNames(src[0], dest[0], () => {
 			processCityData(src[1], dest[1]).then(() => {
-				process.stdout.write('\n');
-				log.info('City IPv4 data processed');
+				log.info('Processed city IPv4 data');
 				return processCityData(src[2], dest[2]);
 			}).then(() => {
-				log.info('City IPv6 data processed');
+				log.info('Processed city IPv6 data');
 				cb(null, database);
 			});
 		});
@@ -729,10 +722,9 @@ async.eachSeries(databases, (database, nextDatabase) => {
 		log.error('Failed to update databases from MaxMind!', err);
 		process.exit(1);
 	} else {
-		process.stdout.write('\n');
 		log.success('All databases have been successfully updated from MaxMind');
 		if (args.indexOf('debug') !== -1) {
-			console.debug('Notice: temporary files are not deleted for debug purposes');
+			log.info('Debug mode: temporary files preserved at ' + tmpPath);
 		} else {
 			rimraf(tmpPath);
 		}
