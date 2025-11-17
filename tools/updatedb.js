@@ -346,9 +346,9 @@ async function processCountryData(src, dest) {
 	let tstart = Date.now();
 	const datFile = fs.createWriteStream(dataFile);
 
-	function processLine(line) {
-		const fields = CSVtoArray(line);
-		if (!fields || fields.length < 6) return log.warn('Malformed line detected:', line);
+        function processLine(line) {
+                const fields = CSVtoArray(line);
+                if (!fields || fields.length < 6) return log.warn('Malformed line detected:', line);
 
 		lines++;
 
@@ -405,15 +405,53 @@ async function processCountryData(src, dest) {
 		}
 	}
 
-	const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile), crlfDelay: Infinity });
-	let i = 0;
-	for await (const line of rl) {
-		i++;
-		if (i === 1) continue;
-		await processLine(line);
-	}
-	datFile.close();
-	log.done();
+        await new Promise((resolve, reject) => {
+                const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile), crlfDelay: Infinity });
+                let settled = false;
+                let i = 0;
+
+                function finish(err) {
+                        if (settled) return;
+                        settled = true;
+                        if (!rl.closed) rl.close();
+                        if (err) reject(err);
+                        else resolve();
+                }
+
+                function resume() {
+                        if (!settled && !rl.closed) rl.resume();
+                }
+
+                rl.on('line', line => {
+                        rl.pause();
+                        i++;
+                        if (i === 1) {
+                                resume();
+                                return;
+                        }
+
+                        let result;
+                        try {
+                                result = processLine(line);
+                        } catch (err) {
+                                finish(err);
+                                return;
+                        }
+
+                        if (result && typeof result.then === 'function') {
+                                result.then(() => {
+                                        resume();
+                                }).catch(finish);
+                        } else {
+                                resume();
+                        }
+                });
+
+                rl.on('close', () => finish());
+                rl.on('error', finish);
+        });
+        datFile.close();
+        log.done();
 }
 
 async function processCityData(src, dest) {
@@ -514,14 +552,52 @@ async function processCityData(src, dest) {
 		}
 	}
 
-	const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile), crlfDelay: Infinity });
-	let i = 0;
-	for await (const line of rl) {
-		i++;
-		if (i === 1) continue;
-		await processLine(line);
-	}
-	datFile.close();
+        await new Promise((resolve, reject) => {
+                const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile), crlfDelay: Infinity });
+                let settled = false;
+                let i = 0;
+
+                function finish(err) {
+                        if (settled) return;
+                        settled = true;
+                        if (!rl.closed) rl.close();
+                        if (err) reject(err);
+                        else resolve();
+                }
+
+                function resume() {
+                        if (!settled && !rl.closed) rl.resume();
+                }
+
+                rl.on('line', line => {
+                        rl.pause();
+                        i++;
+                        if (i === 1) {
+                                resume();
+                                return;
+                        }
+
+                        let result;
+                        try {
+                                result = processLine(line);
+                        } catch (err) {
+                                finish(err);
+                                return;
+                        }
+
+                        if (result && typeof result.then === 'function') {
+                                result.then(() => {
+                                        resume();
+                                }).catch(finish);
+                        } else {
+                                resume();
+                        }
+                });
+
+                rl.on('close', () => finish());
+                rl.on('error', finish);
+        });
+        datFile.close();
 }
 
 function processCityDataNames(src, dest, cb) {
