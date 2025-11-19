@@ -112,8 +112,8 @@ function tryFixingLine(line) {
 		pos1 = pos2;
 		pos2 = line.indexOf(',', pos1 + 1);
 		if (pos2 < 0) pos2 = line.length;
-		if (line.indexOf('\'', (pos1 || 0)) > -1 && line.indexOf('\'', pos1) < pos2 && line[pos1 + 1] != '"' && line[pos2 - 1] != '"') {
-			line = line.substr(0, pos1 + 1) + '"' + line.substr(pos1 + 1, pos2 - pos1 - 1) + '"' + line.substr(pos2, line.length - pos2);
+		if (line.indexOf('\'', (pos1 || 0)) > -1 && line.indexOf('\'', pos1) < pos2 && line[pos1 + 1] !== '"' && line[pos2 - 1] !== '"') {
+			line = line.substring(0, pos1 + 1) + '"' + line.substring(pos1 + 1, pos2) + '"' + line.substring(pos2);
 			pos2 = line.indexOf(',', pos2 + 1);
 			if (pos2 < 0) pos2 = line.length;
 		}
@@ -341,9 +341,9 @@ async function processCountryData(src, dest) {
 	let tstart = Date.now();
 	const datFile = fs.createWriteStream(dataFile);
 
-        function processLine(line) {
-                const fields = CSVtoArray(line);
-                if (!fields || fields.length < 6) return log.warn('Malformed line detected:', line);
+	function processLine(line) {
+		const fields = CSVtoArray(line);
+		if (!fields || fields.length < 6) return log.warn('Malformed line detected:', line);
 
 		lines++;
 
@@ -375,8 +375,8 @@ async function processCountryData(src, dest) {
 				bsz = 10;
 
 				rngip = new Address4(fields[0]);
-				sip = parseInt(rngip.startAddress().bigInt(), 10);
-				eip = parseInt(rngip.endAddress().bigInt(), 10);
+				sip = parseInt(rngip.startAddress().bigInt().toString(), 10);
+				eip = parseInt(rngip.endAddress().bigInt().toString(), 10);
 
 				b = Buffer.alloc(bsz);
 				b.fill(0);
@@ -400,53 +400,53 @@ async function processCountryData(src, dest) {
 		}
 	}
 
-        await new Promise((resolve, reject) => {
-                const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile), crlfDelay: Infinity });
-                let settled = false;
-                let i = 0;
+	await new Promise((resolve, reject) => {
+		const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile), crlfDelay: Infinity });
+		let settled = false;
+		let i = 0;
 
-                function finish(err) {
-                        if (settled) return;
-                        settled = true;
-                        if (!rl.closed) rl.close();
-                        if (err) reject(err);
-                        else resolve();
-                }
+		function finish(err) {
+			if (settled) return;
+			settled = true;
+			if (!rl.closed) rl.close();
+			if (err) reject(err);
+			else resolve();
+		}
 
-                function resume() {
-                        if (!settled && !rl.closed) rl.resume();
-                }
+		function resume() {
+			if (!settled && !rl.closed) rl.resume();
+		}
 
-                rl.on('line', line => {
-                        rl.pause();
-                        i++;
-                        if (i === 1) {
-                                resume();
-                                return;
-                        }
+		rl.on('line', line => {
+			rl.pause();
+			i++;
+			if (i === 1) {
+				resume();
+				return;
+			}
 
-                        let result;
-                        try {
-                                result = processLine(line);
-                        } catch (err) {
-                                finish(err);
-                                return;
-                        }
+			let result;
+			try {
+				result = processLine(line);
+			} catch (err) {
+				finish(err);
+				return;
+			}
 
-                        if (result && typeof result.then === 'function') {
-                                result.then(() => {
-                                        resume();
-                                }).catch(finish);
-                        } else {
-                                resume();
-                        }
-                });
+			if (result && typeof result.then === 'function') {
+				result.then(() => {
+					resume();
+				}).catch(finish);
+			} else {
+				resume();
+			}
+		});
 
-                rl.on('close', () => finish());
-                rl.on('error', finish);
-        });
-        datFile.close();
-        log.info('Processed country data');
+		rl.on('close', () => finish());
+		rl.on('error', finish);
+	});
+	datFile.close();
+	log.info('Processed country data');
 }
 
 async function processCityData(src, dest) {
@@ -514,8 +514,8 @@ async function processCityData(src, dest) {
 			bsz = 24;
 
 			rngip = new Address4(fields[0]);
-			sip = parseInt(rngip.startAddress().bigInt(), 10);
-			eip = parseInt(rngip.endAddress().bigInt(), 10);
+			sip = parseInt(rngip.startAddress().bigInt().toString(), 10);
+			eip = parseInt(rngip.endAddress().bigInt().toString(), 10);
 			locId = parseInt(fields[1], 10);
 			locId = cityLookup[locId];
 			b = Buffer.alloc(bsz);
@@ -546,52 +546,52 @@ async function processCityData(src, dest) {
 		}
 	}
 
-        await new Promise((resolve, reject) => {
-                const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile), crlfDelay: Infinity });
-                let settled = false;
-                let i = 0;
+	await new Promise((resolve, reject) => {
+		const rl = readline.createInterface({ input: fs.createReadStream(tmpDataFile), crlfDelay: Infinity });
+		let settled = false;
+		let i = 0;
 
-                function finish(err) {
-                        if (settled) return;
-                        settled = true;
-                        if (!rl.closed) rl.close();
-                        if (err) reject(err);
-                        else resolve();
-                }
+		function finish(err) {
+			if (settled) return;
+			settled = true;
+			if (!rl.closed) rl.close();
+			if (err) reject(err);
+			else resolve();
+		}
 
-                function resume() {
-                        if (!settled && !rl.closed) rl.resume();
-                }
+		function resume() {
+			if (!settled && !rl.closed) rl.resume();
+		}
 
-                rl.on('line', line => {
-                        rl.pause();
-                        i++;
-                        if (i === 1) {
-                                resume();
-                                return;
-                        }
+		rl.on('line', line => {
+			rl.pause();
+			i++;
+			if (i === 1) {
+				resume();
+				return;
+			}
 
-                        let result;
-                        try {
-                                result = processLine(line);
-                        } catch (err) {
-                                finish(err);
-                                return;
-                        }
+			let result;
+			try {
+				result = processLine(line);
+			} catch (err) {
+				finish(err);
+				return;
+			}
 
-                        if (result && typeof result.then === 'function') {
-                                result.then(() => {
-                                        resume();
-                                }).catch(finish);
-                        } else {
-                                resume();
-                        }
-                });
+			if (result && typeof result.then === 'function') {
+				result.then(() => {
+					resume();
+				}).catch(finish);
+			} else {
+				resume();
+			}
+		});
 
-                rl.on('close', () => finish());
-                rl.on('error', finish);
-        });
-        datFile.close();
+		rl.on('close', () => finish());
+		rl.on('error', finish);
+	});
+	datFile.close();
 }
 
 function processCityDataNames(src, dest, cb) {

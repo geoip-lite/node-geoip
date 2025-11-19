@@ -1,6 +1,6 @@
 {
   "name": "geoip-lite2",
-  "version": "2.2.8-beta.4",
+  "version": "2.2.8-beta.5",
   "description": "A light weight native JavaScript implementation of GeoIP API from MaxMind. Improved and faster version by Sefinek.",
   "keywords": [
     "city",
@@ -68,6 +68,8 @@
     "README.md"
   ],
   "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "minify": "node minify.js",
     "test": "jest test",
     "up": "ncu -u && npm install && npm update && npm audit fix",
@@ -80,7 +82,7 @@
     "async": "^3.2.6",
     "iconv-lite": "0.7.0",
     "ip-address": "^10.1.0",
-    "rimraf": "^6.1.0"
+    "rimraf": "^6.1.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -89,6 +91,6 @@
     "terser": "^5.44.1"
   },
   "engines": {
-    "node": ">=10.3.0"
+    "node": ">=20.0.0"
   }
 }
