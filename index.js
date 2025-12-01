@@ -8,7 +8,7 @@ const { isIP } = require('node:net');
 const async = require('async');
 const { aton4, aton6, cmp6, ntoa4, ntoa6, cmp } = require('./utils.js');
 const fsWatcher = require('./fsWatcher.js');
-const { version } = require('../package.json');
+const { version } = require('./package.json');
 
 // ============================================================================
 // Configuration
@@ -18,7 +18,7 @@ const watcherName = 'dataWatcher';
 
 const geoDataDir = resolve(
 	__dirname,
-	global.geoDataDir || process.env.GEODATADIR || '../data/'
+	global.geoDataDir || process.env.GEODATADIR || './data/'
 );
 
 const dataFiles = {

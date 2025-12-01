@@ -2,9 +2,6 @@ import js from '@eslint/js';
 import globals from 'globals';
 
 export default [
-	{
-		ignores: ['node_modules/**', '**/*min.js', '**/*bundle*', 'build/**', 'dist/**'],
-	},
 	js.configs.recommended,
 	{
 		languageOptions: {
@@ -53,5 +50,6 @@ export default [
 			'wrap-regex': 'warn',
 			'yoda': 'error',
 		},
+		ignores: ['node_modules', '*min.js', '*bundle*', 'build/*', 'dist/*'],
 	},
 ];

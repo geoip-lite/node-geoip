@@ -1,4 +1,4 @@
-const geoIp2 = require('../lib/main.js');
+const geoIp2 = require('../index.js');
 
 const ipv4 = geoIp2.lookup('109.199.64.0');
 console.log(ipv4);

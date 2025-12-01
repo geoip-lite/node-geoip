@@ -1,6 +1,6 @@
 {
   "name": "geoip-lite2",
-  "version": "2.2.8-beta.6",
+  "version": "2.2.8-beta.7",
   "description": "A light weight native JavaScript implementation of GeoIP API from MaxMind. Improved and faster version by Sefinek.",
   "keywords": [
     "city",
@@ -52,7 +52,7 @@
   "license": "Apache-2.0",
   "author": "Philip Tellis <philip@bluesmoon.info> (https://bluesmoon.info)",
   "type": "commonjs",
-  "main": "dist/main.js",
+  "main": "index.js",
   "types": "index.d.ts",
   "directories": {
     "lib": "lib",
@@ -60,17 +60,18 @@
   },
   "files": [
     "data",
-    "dist",
     "tools",
     "AUTHORS",
+    "fsWatcher.js",
     "index.d.ts",
+    "index.js",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "utils.js"
   ],
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "minify": "node minify.js",
     "test": "jest test",
     "up": "ncu -u && npm install && npm update && npm audit fix",
     "updatedb": "node tools/updatedb.js",
@@ -87,8 +88,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "globals": "^16.5.0",
-    "jest": "^30.2.0",
-    "terser": "^5.44.1"
+    "jest": "^30.2.0"
   },
   "engines": {
     "node": ">=20.0.0"

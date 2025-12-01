@@ -1,6 +1,6 @@
 const assert = require('assert');
 const t1 = +new Date();
-const geoIp2 = require('../lib/main.js');
+const geoIp2 = require('../index.js');
 const t2 = +new Date();
 
 if (process.argv.length > 2) {

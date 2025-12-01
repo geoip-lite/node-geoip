@@ -23,7 +23,7 @@ const async = require('async');
 const { decodeStream } = require('iconv-lite');
 const rimraf = require('rimraf').sync;
 const AdmZip = require('adm-zip');
-const utils = require('../lib/utils.js');
+const utils = require('../utils.js');
 const { Address6, Address4 } = require('ip-address');
 
 // ============================================================================

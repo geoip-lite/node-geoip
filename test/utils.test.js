@@ -1,4 +1,4 @@
-const utils = require('../lib/utils.js');
+const utils = require('../utils.js');
 
 describe('Utility Functions', () => {
 	describe('#aton4', () => {

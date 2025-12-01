@@ -1,4 +1,4 @@
-const geoIp2 = require('../lib/main.js');
+const geoIp2 = require('../index.js');
 const ip = '86.63.89.41';
 
 // Function

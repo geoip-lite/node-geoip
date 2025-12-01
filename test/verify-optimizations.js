@@ -3,8 +3,8 @@
 // Verifies that all code optimizations are working correctly
 // ============================================================================
 
-const geoIp2 = require('../dist/main.js');
-const utils = require('../lib/utils.js');
+const geoIp2 = require('../index.js');
+const utils = require('../utils.js');
 
 console.log('╔════════════════════════════════════════════════════════════════╗');
 console.log('║         VERIFICATION OF CODE OPTIMIZATIONS                     ║');
