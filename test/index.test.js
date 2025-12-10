@@ -1,3 +1,4 @@
+const { describe, expect, it } = require('@jest/globals');
 const geoIp2 = require('../index.js');
 
 describe('GeoIP2', () => {
