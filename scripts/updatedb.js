@@ -427,12 +427,19 @@ async function processCountryData(src, dest) {
 		input: fs.createReadStream(tmpDataFile),
 		crlfDelay: Infinity
 	});
-	var i = 0;
-	for await (var line of rl) {
-		i++;
-		if(i == 1) continue;
-		await processLine(line);
-	}
+	// Use event-based readline instead of for-await to avoid Node 24 regression
+	// See: https://github.com/nodejs/node/issues/60507
+	await new Promise((resolve, reject) => {
+		var i = 0;
+		rl.on('line', (line) => {
+			i++;
+			if (i == 1) return;
+			rl.pause();
+			processLine(line).then(() => rl.resume()).catch(reject);
+		});
+		rl.on('close', resolve);
+		rl.on('error', reject);
+	});
 	datFile.close();
 	console.log(chalk.green(' DONE'));
 }
@@ -543,12 +550,19 @@ async function processCityData(src, dest) {
 		input: fs.createReadStream(tmpDataFile),
 		crlfDelay: Infinity
 	});
-	var i = 0;
-	for await (var line of rl) {
-		i++;
-		if(i == 1) continue;
-		await processLine(line);
-	}
+	// Use event-based readline instead of for-await to avoid Node 24 regression
+	// See: https://github.com/nodejs/node/issues/60507
+	await new Promise((resolve, reject) => {
+		var i = 0;
+		rl.on('line', (line) => {
+			i++;
+			if (i == 1) return;
+			rl.pause();
+			processLine(line).then(() => rl.resume()).catch(reject);
+		});
+		rl.on('close', resolve);
+		rl.on('error', reject);
+	});
 	datFile.close();
 }
 
