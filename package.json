@@ -1,6 +1,6 @@
 {
 	"name"        :  "geoip-lite",
-	"version"     :  "1.4.10",
+	"version"     :  "2.0.0",
 	"description" :  "A light weight native JavaScript implementation of GeoIP API from MaxMind",
 	"keywords"    :  ["geo", "geoip", "ip", "ipv4", "ipv6", "geolookup", "maxmind", "geolite"],
 	"homepage"    :  "https://github.com/geoip-lite/node-geoip",
@@ -8,29 +8,28 @@
 	"files"       :  ["lib/", "data/", "test/","scripts/"],
 	"main"        :  "lib/geoip.js",
 	"repository"  :  { "type": "git", "url": "git://github.com/geoip-lite/node-geoip.git" },
-	"engines"     :  { "node": ">=10.3.0" },
+	"engines"     :  { "node": ">=24.0.0" },
 	"scripts": {
 		"pretest": "eslint .",
-		"test": "nodeunit --reporter=minimal test/tests.js",
+		"test": "node --test test/tests.js",
 		"updatedb": "node scripts/updatedb.js",
 		"updatedb-debug": "node scripts/updatedb.js debug",
 		"updatedb-force": "node scripts/updatedb.js force"
 	},
 	"dependencies": {
-		"async": "2.1 - 2.6.4",
 		"chalk": "4.1 - 4.1.2",
 		"iconv-lite": "0.4.13 - 0.6.3",
 		"ip-address": "5.8.9 - 5.9.4",
 		"lazy": "1.0.11",
-		"rimraf": "2.5.2 - 2.7.1",
 		"yauzl": "2.9.2 - 2.10.0"
 	},
 	"config": {
 		"update": true
 	},
 	"devDependencies": {
-		"eslint": "^5.12.1",
-		"nodeunit": "^0.11.2"
+		"@eslint/js": "^10.0.0",
+		"eslint": "^10.0.0",
+		"globals": "^17.0.0"
 	},
 	"license": "Apache-2.0"
 }

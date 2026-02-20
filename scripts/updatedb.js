@@ -8,17 +8,12 @@ var fs = require('fs');
 var http = require('http');
 var https = require('https');
 var path = require('path');
-var url = require('url');
 var zlib = require('zlib');
 var readline = require('readline');
 
-fs.existsSync = fs.existsSync || path.existsSync;
-
-var async = require('async');
 var chalk = require('chalk');
 var iconv = require('iconv-lite');
 var lazy = require('lazy');
-var rimraf = require('rimraf').sync;
 var yauzl = require('yauzl');
 var utils = require('../lib/utils');
 var Address6 = require('ip-address').Address6;
@@ -138,9 +133,15 @@ function CSVtoArray(text) {
 }
 
 function getHTTPOptions(downloadUrl) {
-	var options = url.parse(downloadUrl);
-	options.headers = {
-		'User-Agent': user_agent
+	var parsedUrl = new URL(downloadUrl);
+	var options = {
+		protocol: parsedUrl.protocol,
+		hostname: parsedUrl.hostname,
+		port: parsedUrl.port,
+		path: parsedUrl.pathname + parsedUrl.search,
+		headers: {
+			'User-Agent': user_agent
+		}
 	};
 
 	if (process.env.http_proxy || process.env.https_proxy) {
@@ -152,7 +153,7 @@ function getHTTPOptions(downloadUrl) {
 				: (HttpsProxyAgentModule.HttpsProxyAgent || HttpsProxyAgentModule.default || HttpsProxyAgentModule);
 			options.agent = new HttpsProxyAgent(process.env.http_proxy || process.env.https_proxy);
 		}
-		catch (e) {
+		catch {
 			console.error("Install https-proxy-agent to use an HTTP/HTTPS proxy");
 			process.exit(-1);
 		}
@@ -190,7 +191,7 @@ function check(database, cb) {
 				return https.get(getHTTPOptions(response.headers.location), onResponse);
 			} else if (status !== 200) {
 				console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
-				client.abort();
+				client.destroy();
 				process.exit(1);
 			}
     
@@ -213,7 +214,7 @@ function check(database, cb) {
 				else {
 					console.log(chalk.red('ERROR') + ': Could not retrieve checksum for', database.type, chalk.red('Aborting'));
 					console.log('Run with "force" to update without checksum');
-					client.abort();
+					client.destroy();
 					process.exit(1);
 				}
 				cb(null, database);
@@ -253,7 +254,7 @@ function fetch(database, cb) {
 			return https.get(getHTTPOptions(response.headers.location), onResponse);
 		} else if (status !== 200) {
 			console.log(chalk.red('ERROR') + ': HTTP Request Failed [%d %s]', status, http.STATUS_CODES[status]);
-			client.abort();
+			client.destroy();
 			process.exit(1);
 		}
 
@@ -416,7 +417,7 @@ async function processCountryData(src, dest) {
 	var dataFile = path.join(dataPath, dest);
 	var tmpDataFile = path.join(tmpPath, src);
 
-	rimraf(dataFile);
+	fs.rmSync(dataFile, { force: true });
 	mkdir(dataFile);
 
 	process.stdout.write('Processing Data (may take a moment) ...');
@@ -533,7 +534,7 @@ async function processCityData(src, dest) {
 	var dataFile = path.join(dataPath, dest);
 	var tmpDataFile = path.join(tmpPath, src);
 
-	rimraf(dataFile);
+	fs.rmSync(dataFile, { force: true });
 
 	process.stdout.write('Processing Data (may take a moment) ...');
 	var tstart = Date.now();
@@ -599,7 +600,7 @@ function processCityDataNames(src, dest, cb) {
 	var dataFile = path.join(dataPath, dest);
 	var tmpDataFile = path.join(tmpPath, src);
 
-	rimraf(dataFile);
+	fs.rmSync(dataFile, { force: true });
 
 	var datFile = fs.openSync(dataFile, "w");
 
@@ -666,24 +667,49 @@ if (!license_key) {
 	process.exit(1);
 }
 
-rimraf(tmpPath);
+function promisifyCallback(fn) {
+	return function () {
+		var args = Array.prototype.slice.call(arguments);
+		return new Promise(function (resolve, reject) {
+			args.push(function () {
+				var cbArgs = Array.prototype.slice.call(arguments);
+				var err = cbArgs.shift();
+				if (err) return reject(err);
+				resolve(cbArgs);
+			});
+			fn.apply(null, args);
+		});
+	};
+}
+
+var checkP = promisifyCallback(check);
+var fetchP = promisifyCallback(fetch);
+var extractP = promisifyCallback(extract);
+var processDataP = promisifyCallback(processData);
+var updateChecksumP = promisifyCallback(updateChecksum);
+
+fs.rmSync(tmpPath, { recursive: true, force: true });
 mkdir(tmpPath);
 
-async.eachSeries(databases, function(database, nextDatabase) {
-
-	async.seq(check, fetch, extract, processData, updateChecksum)(database, nextDatabase);
-
-}, function(err) {
-	if (err) {
-		console.log(chalk.red('Failed to Update Databases from MaxMind.'), err);
-		process.exit(1);
-	} else {
-		console.log(chalk.green('Successfully Updated Databases from MaxMind.'));
-		if (args.indexOf("debug") !== -1) {
-			console.log(chalk.yellow.bold('Notice: temporary files are not deleted for debug purposes.'));
-		} else {
-			rimraf(tmpPath);
-		}
-		process.exit(0);
+(async function () {
+	for (var i = 0; i < databases.length; i++) {
+		var results = await checkP(databases[i]);
+		var database = results[0];
+		results = await fetchP(database);
+		results = await extractP(results[0], results[1], results[2]);
+		database = results[0];
+		await processDataP(database);
+		await updateChecksumP(database);
 	}
+
+	console.log(chalk.green('Successfully Updated Databases from MaxMind.'));
+	if (args.indexOf("debug") !== -1) {
+		console.log(chalk.yellow.bold('Notice: temporary files are not deleted for debug purposes.'));
+	} else {
+		fs.rmSync(tmpPath, { recursive: true, force: true });
+	}
+	process.exit(0);
+})().catch(function (err) {
+	console.log(chalk.red('Failed to Update Databases from MaxMind.'), err);
+	process.exit(1);
 });
