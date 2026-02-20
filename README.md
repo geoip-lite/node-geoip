@@ -32,8 +32,8 @@ why geoip-lite
 --------------
 
 `geoip-lite` is a fully JavaScript implementation of the MaxMind geoip API.  It is not as fully featured as bindings that use `libgeoip`.
-By reducing scope, this package is about 40% faster at doing lookups.  On average, an IP to Location lookup should take 20 microseconds on
-a Macbook Pro.  IPv4 addresses take about 6 microseconds, while IPv6 addresses take about 30 microseconds.
+By reducing scope, this package is significantly faster at doing lookups.  On average, an IPv4 lookup takes under 0.5 microseconds and
+an IPv6 lookup takes about 1.3 microseconds.
 
 synopsis
 --------
@@ -56,6 +56,11 @@ console.log(geo);
   area: 1000 }
 
 ```
+
+requirements
+------------
+
+- Node.js >= 24.0.0
 
 installation
 ------------
@@ -184,10 +189,10 @@ This tool can be used with `npm run-script updatedb` to periodically update geo 
 The following environment variables can be set.
 
 ```bash
-# Override the default node_modules/geoip-lite/data dir
+# Override the default node_modules/geoip-lite/tmp dir
 GEOTMPDIR=/some/path
 
-# Override the default node_modules/geoip-lite/tmp dir
+# Override the default node_modules/geoip-lite/data dir
 GEODATADIR=/some/path
 ```
 
@@ -205,7 +210,8 @@ cost though, and you make it up at run time with very fast lookups.
 
 ### Memory usage ###
 
-Quick test on memory consumption shows that library uses around 100Mb per process
+Quick test on memory consumption shows that the library uses around 135 MB RSS per process, with the
+bulk of that being the binary data buffers held in external memory.
 
 ```javascript
     var geoip = require('geoip-lite');
@@ -213,10 +219,11 @@ Quick test on memory consumption shows that library uses around 100Mb per proces
     /**
     * Outputs:
     * {
-    *     rss: 126365696,
-    *     heapTotal: 10305536,
-    *     heapUsed: 5168944,
-    *     external: 104347120
+    *     rss: 141557760,
+    *     heapTotal: 6815744,
+    *     heapUsed: 4063232,
+    *     external: 110378968,
+    *     arrayBuffers: 108851048
     * }
     **/
 ```
