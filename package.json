@@ -1,14 +1,33 @@
 {
-	"name"        :  "geoip-lite",
-	"version"     :  "2.0.0",
-	"description" :  "A light weight native JavaScript implementation of GeoIP API from MaxMind",
-	"keywords"    :  ["geo", "geoip", "ip", "ipv4", "ipv6", "geolookup", "maxmind", "geolite"],
-	"homepage"    :  "https://github.com/geoip-lite/node-geoip",
-	"author"      :  "Philip Tellis <philip@bluesmoon.info> (http://bluesmoon.info/)",
-	"files"       :  ["lib/", "data/", "test/","scripts/"],
-	"main"        :  "lib/geoip.js",
-	"repository"  :  { "type": "git", "url": "git://github.com/geoip-lite/node-geoip.git" },
-	"engines"     :  { "node": ">=24.0.0" },
+	"name": "geoip-lite",
+	"version": "2.0.0",
+	"description": "A light weight native JavaScript implementation of GeoIP API from MaxMind",
+	"keywords": [
+		"geo",
+		"geoip",
+		"ip",
+		"ipv4",
+		"ipv6",
+		"geolookup",
+		"maxmind",
+		"geolite"
+	],
+	"homepage": "https://github.com/geoip-lite/node-geoip",
+	"author": "Philip Tellis <philip@bluesmoon.info> (http://bluesmoon.info/)",
+	"files": [
+		"lib/",
+		"data/",
+		"test/",
+		"scripts/"
+	],
+	"main": "lib/geoip.js",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/geoip-lite/node-geoip.git"
+	},
+	"engines": {
+		"node": ">=24.0.0"
+	},
 	"scripts": {
 		"pretest": "eslint .",
 		"test": "node --test test/tests.js",
@@ -21,7 +40,7 @@
 		"iconv-lite": "0.4.13 - 0.6.3",
 		"ip-address": "5.8.9 - 5.9.4",
 		"lazy": "1.0.11",
-		"yauzl": "2.9.2 - 2.10.0"
+		"yauzl": "^3.2.1"
 	},
 	"config": {
 		"update": true
