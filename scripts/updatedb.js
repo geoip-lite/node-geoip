@@ -389,8 +389,8 @@ async function processCountryData(src, dest) {
 				bsz = 10;
 
 				rngip = new Address4(fields[0]);
-				sip = parseInt(rngip.startAddress().bigInteger(),10);
-				eip = parseInt(rngip.endAddress().bigInteger(),10);
+				sip = Number(rngip.startAddress().bigInt());
+				eip = Number(rngip.endAddress().bigInt());
 	
 				b = Buffer.alloc(bsz);
 				b.fill(0);
@@ -499,8 +499,8 @@ async function processCityData(src, dest) {
 			bsz = 24;
 
 			rngip = new Address4(fields[0]);
-			sip = parseInt(rngip.startAddress().bigInteger(),10);
-			eip = parseInt(rngip.endAddress().bigInteger(),10);
+			sip = Number(rngip.startAddress().bigInt());
+			eip = Number(rngip.endAddress().bigInt());
 			locId = parseInt(fields[1], 10);
 			locId = cityLookup[locId];
 			b = Buffer.alloc(bsz);
