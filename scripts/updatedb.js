@@ -32,6 +32,17 @@ var geodatadir = args.find(function(arg) {
 if (typeof geodatadir === 'undefined' && typeof process.env.GEODATADIR !== 'undefined') {
 	geodatadir = 'geodatadir='+process.env.GEODATADIR;
 }
+var series = args.find(function(arg) {
+	return arg.match(/^series=[\w./]+/) !== null;
+});
+if (typeof series === 'undefined' && typeof process.env.GEODBSERIES !== 'undefined') {
+	series = process.env.GEODBSERIES;
+} else if (typeof series !== 'undefined') {
+  series = series.slice('series='.length);
+}
+if (typeof series === 'undefined') {
+  series = 'GeoLite2'
+}
 var dataPath = path.resolve(__dirname, '..', 'data');
 if (typeof geodatadir !== 'undefined') {
 	dataPath = path.resolve(process.cwd(), geodatadir.split('=')[1]);
@@ -46,13 +57,13 @@ var cityLookup = {NaN: -1};
 var databases = [
 	{
 		type: 'country',
-		url: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip&'+license_key,
-		checksum: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip.sha256&'+license_key,
-		fileName: 'GeoLite2-Country-CSV.zip',
+		url: 'https://download.maxmind.com/app/geoip_download?edition_id='+series+'-Country-CSV&suffix=zip&'+license_key,
+		checksum: 'https://download.maxmind.com/app/geoip_download?edition_id='+series+'-Country-CSV&suffix=zip.sha256&'+license_key,
+		fileName: series+'-Country-CSV.zip',
 		src: [
-			'GeoLite2-Country-Locations-en.csv',
-			'GeoLite2-Country-Blocks-IPv4.csv',
-			'GeoLite2-Country-Blocks-IPv6.csv'
+			series+'-Country-Locations-en.csv',
+			series+'-Country-Blocks-IPv4.csv',
+			series+'-Country-Blocks-IPv6.csv'
 		],
 		dest: [
 			'',
@@ -62,13 +73,13 @@ var databases = [
 	},
 	{
 		type: 'city',
-		url: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip&'+license_key,
-		checksum: 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip.sha256&'+license_key,
-		fileName: 'GeoLite2-City-CSV.zip',
+		url: 'https://download.maxmind.com/app/geoip_download?edition_id='+series+'-City-CSV&suffix=zip&'+license_key,
+		checksum: 'https://download.maxmind.com/app/geoip_download?edition_id='+series+'-City-CSV&suffix=zip.sha256&'+license_key,
+		fileName: series+'-City-CSV.zip',
 		src: [
-			'GeoLite2-City-Locations-en.csv',
-			'GeoLite2-City-Blocks-IPv4.csv',
-			'GeoLite2-City-Blocks-IPv6.csv'
+			series+'-City-Locations-en.csv',
+			series+'-City-Blocks-IPv4.csv',
+			series+'-City-Blocks-IPv6.csv'
 		],
 		dest: [
 			'geoip-city-names.dat',
