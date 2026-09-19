@@ -204,7 +204,7 @@ however it is the best available for free.  You can use the commercial GeoIP dat
 accuracy by buying a license from MaxMind, and then using the conversion utility to convert it to a format that
 geoip-lite understands.  You will need to use the `.csv` files from MaxMind for conversion.
 
-Also note that on occassion, the library may take up to 5 seconds to load into memory.  This is largely dependent on
+Also note that on occasion, the library may take up to 5 seconds to load into memory.  This is largely dependent on
 how busy your disk is at that time.  It can take as little as 200ms on a lightly loaded disk.  This is a one time
 cost though, and you make it up at run time with very fast lookups.
 
